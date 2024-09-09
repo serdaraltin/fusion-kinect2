@@ -1,7 +1,7 @@
-#include "FileLogger.hpp"
-#include "KinectDevice.hpp"
-#include "FrameProcessor.hpp"
-#include "DisplayManager.hpp"
+#include "log/FileLogger.hpp"
+#include "device/KinectDevice.hpp"
+#include "image-process/FrameProcessor.hpp"
+#include "gui/DisplayManager.hpp"
 
 void processFrames(FrameProcessor& frame_processor, KinectDevice& kinect) {
     libfreenect2::FrameMap frames;

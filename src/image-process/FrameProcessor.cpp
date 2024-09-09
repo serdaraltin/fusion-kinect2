@@ -1,4 +1,4 @@
-#include "FrameProcessor.hpp"
+#include "image-process/FrameProcessor.hpp"
 
 FrameProcessor::FrameProcessor(const libfreenect2::Freenect2Device::IrCameraParams& ir_params, const libfreenect2::Freenect2Device::ColorCameraParams& color_params)
     : registration_(ir_params, color_params) {}

@@ -1,4 +1,4 @@
-#include "KinectDevice.hpp"
+#include "device/KinectDevice.hpp"
 #include <iostream>
 
 KinectDevice::KinectDevice()

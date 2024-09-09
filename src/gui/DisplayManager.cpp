@@ -1,4 +1,4 @@
-#include "DisplayManager.hpp"
+#include "gui/DisplayManager.hpp"
 
 void DisplayManager::showFrames(const cv::Mat& rgb, const cv::Mat& depth, const cv::Mat& ir) {
     if (rgb.empty() || depth.empty() || ir.empty()) {

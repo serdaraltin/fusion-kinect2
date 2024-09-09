@@ -4,14 +4,14 @@ project(fusion_vision)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(fusion_vision src/main.cpp
-        include/FileLogger.hpp
-        include/KinectDevice.hpp
+        include/log/FileLogger.hpp
+        include/device/KinectDevice.hpp
         src/image-process/FrameProcessor.cpp
         src/gui/DisplayManager.cpp
         src/log/FileLogger.cpp
         src/device/KinectDevice.cpp
-        include/FrameProcessor.hpp
-        include/DisplayManager.hpp
+        include/image-process/FrameProcessor.hpp
+        include/gui/DisplayManager.hpp
 )
 
 #add include
