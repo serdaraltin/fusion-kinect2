@@ -1,1 +1,1 @@
-# fusion-body
+# fusion-kinect2
