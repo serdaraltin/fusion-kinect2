@@ -1,175 +1,177 @@
-
 #include <libfreenect2/libfreenect2.hpp>
 #include <libfreenect2/frame_listener_impl.h>
 #include <libfreenect2/registration.h>
 #include <libfreenect2/packet_pipeline.h>
 #include <libfreenect2/logger.h>
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
-#include <opencv2/opencv.hpp>
-//#include <OpenNI.h>
 
-std::string serial;
-libfreenect2::Freenect2 freenect2;
-libfreenect2::Freenect2Device *dev = 0;
-libfreenect2::PacketPipeline *pipeline = 0;
+using namespace libfreenect2;
+using namespace std;
+using namespace cv;
 
-class MyFileLogger: public libfreenect2::Logger
-{
+// Logger class for file logging
+class FileLogger : public Logger {
 private:
     std::ofstream logfile_;
 public:
-    MyFileLogger(const char *filename)
-    {
-        if (filename)
-            logfile_.open(filename);
+    FileLogger(const char *filename) {
+        if (filename) logfile_.open(filename);
         level_ = Debug;
     }
-    bool good()
-    {
+    bool good() const {
         return logfile_.is_open() && logfile_.good();
     }
-    virtual void log(Level level, const std::string &message)
-    {
-        logfile_ << "[" << libfreenect2::Logger::level2str(level) << "] " << message << std::endl;
+    void log(Level level, const std::string &message) override {
+        logfile_ << "[" << level2str(level) << "] " << message << std::endl;
     }
 };
 
-int create_logger()
-{
-    MyFileLogger *file_logger = new MyFileLogger("LOGFILE");
-    if(file_logger->good())
-    {
-        libfreenect2::setGlobalLogger(file_logger);
-        std::cout << "Log file created." << std::endl;
-        return 0;
-    }else
-    {
-        std::cerr << "Failed to open log file." << std::endl;
-        delete file_logger;
+// Class to handle Kinect device initialization and shutdown
+class KinectDevice {
+private:
+    Freenect2 freenect2_;
+    Freenect2Device *device_;
+    PacketPipeline *pipeline_;
+    SyncMultiFrameListener listener_;
+    std::string serial_;
+
+public:
+    KinectDevice() : device_(nullptr), pipeline_(new CpuPacketPipeline()), listener_(Frame::Color | Frame::Ir | Frame::Depth) {}
+
+    bool initialize() {
+        if (freenect2_.enumerateDevices() == 0) {
+            cout << "No device connected!" << endl;
+            return false;
+        }
+        serial_ = freenect2_.getDefaultDeviceSerialNumber();
+        device_ = freenect2_.openDevice(serial_, pipeline_);
+        if (!device_) {
+            cout << "Failed to open device!" << endl;
+            return false;
+        }
+        device_->setColorFrameListener(&listener_);
+        device_->setIrAndDepthFrameListener(&listener_);
+        return device_->start();
+    }
+
+    void shutdown() {
+        if (device_) {
+            device_->stop();
+            device_->close();
+        }
+    }
+
+    SyncMultiFrameListener& getListener() { return listener_; }
+    Freenect2Device* getDevice() { return device_; }
+};
+
+// Class to process and normalize frames
+class FrameProcessor {
+private:
+    Registration registration_;
+
+public:
+    FrameProcessor(const Freenect2Device::IrCameraParams& ir_params, const Freenect2Device::ColorCameraParams& color_params)
+        : registration_(ir_params, color_params) {}
+
+    Mat processDepthFrame(const Frame* frame) {
+        Mat depth(frame->height, frame->width, CV_16UC1, frame->data);
+        Mat normalized;
+        depth.convertTo(normalized, CV_8UC1, 255.0 / 4500.0);
+        return normalized;
+    }
+
+    Mat processIrFrame(const Frame* frame) {
+        Mat ir(frame->height, frame->width, CV_16UC1, frame->data);
+        Mat normalized;
+        double max_val;
+        minMaxLoc(ir, nullptr, &max_val);
+        ir.convertTo(normalized, CV_8UC1, 255.0 / max_val);
+        return normalized;
+    }
+
+    void applyRegistration(const Frame* rgb, const Frame* depth, Frame* undistorted, Frame* registered) {
+        registration_.apply(rgb, depth, undistorted, registered);
+    }
+};
+
+// Class to manage and display frames
+class DisplayManager {
+public:
+    static void showFrames(const Mat& rgb, const Mat& depth, const Mat& ir) {
+        if (rgb.empty() || depth.empty() || ir.empty()) {
+            cerr << "One or more frames are empty. Skipping display." << endl;
+            return;
+        }
+
+        Size frame_size(640, 480);
+        Mat rgb_resized, depth_resized, ir_resized;
+        resize(rgb, rgb_resized, frame_size);
+        resize(depth, depth_resized, frame_size);
+        resize(ir, ir_resized, frame_size);
+
+        Mat rgb_3ch, depth_3ch, ir_3ch;
+        cvtColor(rgb_resized, rgb_3ch, COLOR_RGBA2BGR);
+        cvtColor(depth_resized, depth_3ch, COLOR_GRAY2BGR);
+        cvtColor(ir_resized, ir_3ch, COLOR_GRAY2BGR);
+
+        Mat top_row, bottom_row, final_display;
+        hconcat(rgb_3ch, depth_3ch, top_row);
+        hconcat(ir_3ch, Mat::zeros(ir_resized.size(), CV_8UC3), bottom_row);
+        vconcat(top_row, bottom_row, final_display);
+
+        namedWindow("Combined View", WINDOW_NORMAL);
+        resizeWindow("Combined View", frame_size.width * 2, frame_size.height * 2);
+
+        imshow("Combined View", final_display);
+    }
+};
+
+void processFrames(FrameProcessor& frame_processor, KinectDevice& kinect) {
+    FrameMap frames;
+    if (!kinect.getListener().waitForNewFrame(frames, 10 * 1000)) {
+        cout << "Timeout!" << endl;
+        return;
+    }
+
+    Frame* rgb = frames[Frame::Color];
+    Frame* depth = frames[Frame::Depth];
+
+    Frame undistorted(512, 424, 4), registered(512, 424, 4);
+    frame_processor.applyRegistration(rgb, depth, &undistorted, &registered);
+
+    Mat rgb_frame = Mat(rgb->height, rgb->width, CV_8UC4, rgb->data);
+    Mat depth_frame = frame_processor.processDepthFrame(depth);
+    Mat ir_frame = frame_processor.processIrFrame(&registered);
+
+    DisplayManager::showFrames(rgb_frame, depth_frame, ir_frame);
+
+    kinect.getListener().release(frames);
+}
+
+int main() {
+    FileLogger file_logger("LOGFILE");
+    if (!file_logger.good()) {
+        cerr << "Failed to open log file." << endl;
         return -1;
     }
-}
+    setGlobalLogger(&file_logger);
+    cout << "Log file created." << endl;
 
-bool find_device()
-{
-    if(freenect2.enumerateDevices() == 0)
-    {
-        std::cout << "no device connected!" << std::endl;
-        return false;
+    KinectDevice kinect;
+    if (!kinect.initialize()) return -1;
+
+    FrameProcessor frame_processor(kinect.getDevice()->getIrCameraParams(), kinect.getDevice()->getColorCameraParams());
+
+    while (true) {
+        processFrames(frame_processor, kinect);
+
+        int key = waitKey(1);
+        if (key == 'q') break;
     }
-    if (serial == "")
-        serial = freenect2.getDefaultDeviceSerialNumber();
-    return true;
-}
 
-cv::Mat convertFrameToMat(libfreenect2::Frame *frame) {
-    return cv::Mat(frame->height, frame->width, CV_8UC4, frame->data);
-}
-
-cv::Mat convertFrameToMatDepth(const libfreenect2::Frame *frame) {
-    cv::Mat f = cv::Mat(frame->height, frame->width, CV_16UC1, frame->data);
-    cv::Mat depth_frame_normalized;
-    f.convertTo(depth_frame_normalized, CV_8UC1, 255.0 / 4500.0); // Normalize et
-    return depth_frame_normalized;
-}
-
-int main()
-{
-    if (!find_device())
-        exit(0);
-    pipeline = new libfreenect2::CpuPacketPipeline();
-    dev = freenect2.openDevice(serial, pipeline);
-
-    int types = 0;
-    bool enable_rgb = true;
-    bool enable_depth = true;
-
-    if (enable_rgb)
-        types |= libfreenect2::Frame::Color;
-    if (enable_depth)
-        types |= libfreenect2::Frame::Ir | libfreenect2::Frame::Depth;
-
-    libfreenect2::SyncMultiFrameListener listener(types);
-    libfreenect2::FrameMap frames;
-    dev->setColorFrameListener(&listener);
-    dev->setIrAndDepthFrameListener(&listener);
-
-    if (enable_rgb && enable_depth)
-    {
-        if (!dev->start())
-            return -1;
-    }
-    else
-    {
-        if (!dev->startStreams(enable_rgb, enable_depth))
-            return -1;
-    }
-    std::cout << "device serial: " << dev->getSerialNumber() << std::endl;
-    std::cout << "device firmware: " << dev->getFirmwareVersion() << std::endl;
-
-    libfreenect2::Registration* registration = new libfreenect2::Registration(dev->getIrCameraParams(), dev->getColorCameraParams());
-    libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
-
-
-    while(true)
-    {
-        if (!listener.waitForNewFrame(frames, 10*1000)) // 10 sconds
-        {
-            std::cout << "timeout!" << std::endl;
-            return -1;
-        }
-        libfreenect2::Frame *rgb = frames[libfreenect2::Frame::Color];
-        libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
-        libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
-
-        registration->apply(rgb, depth, &undistorted, &registered);
-
-        cv::Mat rgb_frame = convertFrameToMat(rgb);
-        cv::Mat depth_frame = convertFrameToMatDepth(depth);
-        cv::Mat ir_frame = convertFrameToMatDepth(ir);
-
-
-        // IR verisini normalize et
-        cv::Mat ir_frame_normalized;
-        double max_val;
-        cv::minMaxLoc(ir_frame, nullptr, &max_val);
-        ir_frame.convertTo(ir_frame_normalized, CV_8UC1, 255.0 / max_val); // Normalize et
-
-        // IR görüntüsünü göster
-        cv::imshow("IR Frame", ir_frame_normalized);
-
-        // Görüntüleri Tek Ekranda Göster
-        if (!rgb_frame.empty() && !depth_frame.empty() && !ir_frame.empty()) {
-            // RGB ve diğer görüntülerin boyutlarını kontrol edin ve uyumlu hale getirin
-            cv::Size new_size(640, 480);
-            cv::resize(rgb_frame, rgb_frame, new_size);
-            cv::resize(depth_frame, depth_frame, new_size);
-            cv::resize(ir_frame, ir_frame, new_size);
-
-            // Görüntüleri uygun türdeki `cv::Mat`'lere dönüştürün
-            cv::Mat rgb_frame_3ch, depth_frame_3ch, ir_frame_3ch;
-            cv::cvtColor(rgb_frame, rgb_frame_3ch, cv::COLOR_RGBA2BGR); // RGB'yi 3 kanal haline getirin
-            cv::cvtColor(depth_frame, depth_frame_3ch, cv::COLOR_GRAY2BGR); // Depth'yi 3 kanal haline getirin
-            cv::cvtColor(ir_frame, ir_frame_3ch, cv::COLOR_GRAY2BGR); // IR'yi 3 kanal haline getirin
-
-            // Görüntüleri birleştir
-            cv::Mat top_row, bottom_row, final_display;
-            cv::hconcat(rgb_frame_3ch, depth_frame_3ch, top_row);
-            cv::hconcat(ir_frame_3ch, cv::Mat::zeros(ir_frame.size(), CV_8UC3), bottom_row); // Eksik 4. alanı siyah olarak doldurun
-            cv::vconcat(top_row, bottom_row, final_display);
-
-            // Görüntüyü Göster
-            cv::imshow("Combined View", final_display);
-        }
-        int key = cv::waitKey(1);
-
-        if (key == 'q')
-            break;
-
-        listener.release(frames);
-    }
-    dev->stop();
-    dev->close();
+    kinect.shutdown();
     return 0;
 }
