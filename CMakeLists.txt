@@ -3,7 +3,16 @@ project(fusion_vision)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(fusion_vision main.cpp)
+add_executable(fusion_vision src/main.cpp
+        src/FileLogger.hpp
+        src/KinectDevice.hpp
+        src/FrameProcessor.cpp
+        src/DisplayManager.cpp
+        src/FileLogger.cpp
+        src/KinectDevice.cpp
+        src/FrameProcessor.hpp
+        src/DisplayManager.hpp
+)
 
 #add include
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
