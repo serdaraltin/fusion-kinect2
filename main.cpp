@@ -66,9 +66,14 @@ bool find_device()
 cv::Mat convertFrameToMat(libfreenect2::Frame *frame) {
     return cv::Mat(frame->height, frame->width, CV_8UC4, frame->data);
 }
+
 cv::Mat convertFrameToMatDepth(const libfreenect2::Frame *frame) {
-    return cv::Mat(frame->height, frame->width, CV_16UC1, frame->data);
+    cv::Mat f = cv::Mat(frame->height, frame->width, CV_16UC1, frame->data);
+    cv::Mat depth_frame_normalized;
+    f.convertTo(depth_frame_normalized, CV_8UC1, 255.0 / 4500.0); // Normalize et
+    return depth_frame_normalized;
 }
+
 int main()
 {
     if (!find_device())
@@ -82,8 +87,8 @@ int main()
 
     if (enable_rgb)
         types |= libfreenect2::Frame::Color;
-    /*if (enable_depth)
-        types |= libfreenect2::Frame::Ir | libfreenect2::Frame::Depth;*/
+    if (enable_depth)
+        types |= libfreenect2::Frame::Ir | libfreenect2::Frame::Depth;
 
     libfreenect2::SyncMultiFrameListener listener(types);
     libfreenect2::FrameMap frames;
@@ -117,19 +122,54 @@ int main()
         libfreenect2::Frame *rgb = frames[libfreenect2::Frame::Color];
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
+
         registration->apply(rgb, depth, &undistorted, &registered);
 
-        cv::Mat frame = convertFrameToMat(rgb);
-        cv::imshow("fusion-body", frame);
+        cv::Mat rgb_frame = convertFrameToMat(rgb);
+        cv::Mat depth_frame = convertFrameToMatDepth(depth);
+        cv::Mat ir_frame = convertFrameToMatDepth(ir);
 
+
+        // IR verisini normalize et
+        cv::Mat ir_frame_normalized;
+        double max_val;
+        cv::minMaxLoc(ir_frame, nullptr, &max_val);
+        ir_frame.convertTo(ir_frame_normalized, CV_8UC1, 255.0 / max_val); // Normalize et
+
+        // IR görüntüsünü göster
+        cv::imshow("IR Frame", ir_frame_normalized);
+
+        // Görüntüleri Tek Ekranda Göster
+        if (!rgb_frame.empty() && !depth_frame.empty() && !ir_frame.empty()) {
+            // RGB ve diğer görüntülerin boyutlarını kontrol edin ve uyumlu hale getirin
+            cv::Size new_size(640, 480);
+            cv::resize(rgb_frame, rgb_frame, new_size);
+            cv::resize(depth_frame, depth_frame, new_size);
+            cv::resize(ir_frame, ir_frame, new_size);
+
+            // Görüntüleri uygun türdeki `cv::Mat`'lere dönüştürün
+            cv::Mat rgb_frame_3ch, depth_frame_3ch, ir_frame_3ch;
+            cv::cvtColor(rgb_frame, rgb_frame_3ch, cv::COLOR_RGBA2BGR); // RGB'yi 3 kanal haline getirin
+            cv::cvtColor(depth_frame, depth_frame_3ch, cv::COLOR_GRAY2BGR); // Depth'yi 3 kanal haline getirin
+            cv::cvtColor(ir_frame, ir_frame_3ch, cv::COLOR_GRAY2BGR); // IR'yi 3 kanal haline getirin
+
+            // Görüntüleri birleştir
+            cv::Mat top_row, bottom_row, final_display;
+            cv::hconcat(rgb_frame_3ch, depth_frame_3ch, top_row);
+            cv::hconcat(ir_frame_3ch, cv::Mat::zeros(ir_frame.size(), CV_8UC3), bottom_row); // Eksik 4. alanı siyah olarak doldurun
+            cv::vconcat(top_row, bottom_row, final_display);
+
+            // Görüntüyü Göster
+            cv::imshow("Combined View", final_display);
+        }
         int key = cv::waitKey(1);
 
         if (key == 'q')
             break;
 
-
         listener.release(frames);
     }
-
-
+    dev->stop();
+    dev->close();
+    return 0;
 }
