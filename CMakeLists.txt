@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(fusion_vision src/main.cpp
         include/FileLogger.hpp
         include/KinectDevice.hpp
-        src/FrameProcessor.cpp
-        src/DisplayManager.cpp
-        src/FileLogger.cpp
-        src/KinectDevice.cpp
+        src/image-process/FrameProcessor.cpp
+        src/gui/DisplayManager.cpp
+        src/log/FileLogger.cpp
+        src/device/KinectDevice.cpp
         include/FrameProcessor.hpp
         include/DisplayManager.hpp
 )
