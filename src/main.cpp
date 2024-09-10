@@ -1,11 +1,13 @@
-#include "log/FileLogger.hpp"
+#include "logging/FileLogger.hpp"
 #include "device/KinectDevice.hpp"
-#include "image-process/FrameProcessor.hpp"
+#include "image-processing/FrameProcessor.hpp"
 #include "gui/DisplayManager.hpp"
 
 using namespace cv;
 using namespace std;
 using namespace libfreenect2;
+
+KinectDevice kinect;
 
 
 void processFrames(FrameProcessor& frame_processor, KinectDevice& kinect) {
@@ -30,7 +32,8 @@ void processFrames(FrameProcessor& frame_processor, KinectDevice& kinect) {
     kinect.getListener().release(frames);
 }
 
-int main() {
+int initializeLog()
+{
     FileLogger file_logger("LOGFILE");
     if (!file_logger.good()) {
         cerr << "Failed to open log file." << endl;
@@ -38,9 +41,12 @@ int main() {
     }
     setGlobalLogger(&file_logger);
     cout << "Log file created." << endl;
+    return 0;
+}
 
-    KinectDevice kinect;
-    if (!kinect.initialize()) return -1;
+int main() {
+    if (!kinect.initialize())
+        return -1;
 
     FrameProcessor frame_processor(kinect.getDevice()->getIrCameraParams(), kinect.getDevice()->getColorCameraParams());
 

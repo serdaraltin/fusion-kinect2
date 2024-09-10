@@ -1,4 +1,4 @@
-#include "log/FileLogger.hpp"
+#include "logging/FileLogger.hpp"
 
 FileLogger::FileLogger(const char *filename) {
     if (filename) logfile_.open(filename);
