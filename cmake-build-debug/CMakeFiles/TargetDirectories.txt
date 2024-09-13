@@ -1,3 +1,0 @@
-/home/main/Project/fusion-body/cmake-build-debug/CMakeFiles/fusion_body.dir
-/home/main/Project/fusion-body/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/main/Project/fusion-body/cmake-build-debug/CMakeFiles/rebuild_cache.dir
