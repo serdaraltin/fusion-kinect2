@@ -54,7 +54,10 @@ int main() {
         processFrames(frame_processor, kinect);
 
         int key = waitKey(1);
-        if (key == 'q' || key == 'p') break;
+        if (key == 'q' || key == 'p')
+        {
+            break;
+        }
     }
 
     kinect.shutdown();
