@@ -1,10 +1,9 @@
 //
-// Created by main on 19.09.2024.
+// Created by Serdar on 19.09.2024.
 //
 
 #ifndef DEVICE_H
 #define DEVICE_H
-
 
 #include "libfreenect2/libfreenect2.hpp"
 #include <iostream>

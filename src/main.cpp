@@ -1,7 +1,7 @@
 #include <format>
 #include <iostream>
-#include <memory>
 #include "device/device.h"
+#include "logger/console_logger.h"
 
 enum LogType
 {
@@ -27,15 +27,16 @@ void logPrint(std::string message, LogType type)
 }
 
 Device* Device::instance;
+ConsoleLogger* ConsoleLogger::instance;
+Device* deviceInstance = Device::getInstance();
+ConsoleLogger* consoleLogger = ConsoleLogger::getInstance();
 
 int main(int argc, char *argv[])
 {
-     Device* deviceInstance = Device::getInstance();
-     logPrint(deviceInstance->getDeviceList()[0], LogType::Info);
 
-     libfreenect2::Freenect2Device *device;
-     libfreenect2::PacketPipeline *pipeline;
+    /* libfreenect2::Freenect2Device *device;
+     libfreenect2::PacketPipeline *pipeline;*/
 
-     logPrint("Finished", LogType::Info);
+     consoleLogger->log(Logger::Info, "Vision Finised.");
      return 0;
 }

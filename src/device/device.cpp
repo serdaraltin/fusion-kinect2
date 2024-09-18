@@ -1,15 +1,19 @@
 //
-// Created by main on 19.09.2024.
+// Created by Serdar on 19.09.2024.
 //
 
 #include "device/device.h"
+#include "logger/console_logger.h"
 
 Device::Device()
 {
-    int device_count = Device::freenect2.enumerateDevices();
-    if (device_count == 0)
+    int deviceCount = Device::freenect2.enumerateDevices();
+    if (deviceCount == 0)
+    {
+        ConsoleLogger::getInstance()->log(Logger::Warning, "Device not found!");
         return;
-    for (int i = 0; i < device_count; i++)
+    }
+    for (int i = 0; i < deviceCount; i++)
         device_list[i] = Device::freenect2.getDeviceSerialNumber(i);
 }
 

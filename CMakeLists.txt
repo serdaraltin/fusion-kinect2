@@ -3,9 +3,14 @@ project(fusion_vision)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(fusion_vision src/main.cpp
+add_executable(fusion_vision
+        src/main.cpp
         src/device/device.cpp
         include/device/device.h
+        include/logger/console_logger.h
+        src/logger/console_logger.cpp
+        include/logger/logger.h
+        lib/libfreenect2/logger.h
 )
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
