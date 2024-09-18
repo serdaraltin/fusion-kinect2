@@ -5,6 +5,8 @@
 #include "device/device.h"
 #include "logger/console_logger.h"
 
+
+
 Device::Device()
 {
     int deviceCount = Device::freenect2.enumerateDevices();
