@@ -9,21 +9,23 @@
 #include <iostream>
 #include <array>
 
-class Device {
-private:
-    libfreenect2::Freenect2 freenect2;
-    int max_device_num = 2;
-    std::array<std::string, sizeof(max_device_num)> device_list;
-    static Device* instance;
-    Device();
+namespace vision
+{
+    class Device {
+    private:
+        libfreenect2::Freenect2 freenect2;
+        int max_device_num = 2;
+        std::array<std::string, sizeof(max_device_num)> device_list;
+        static Device* instance;
+        Device();
 
-public:
-    static Device* getInstance();
-    std::array<std::string, sizeof(max_device_num)> getDeviceList();
-    std::string getDeviceSerial(int index);
-    Device(const Device&) = delete;
-    Device& operator=(const Device&) = delete;
-};
-
+    public:
+        static Device* getInstance();
+        std::array<std::string, sizeof(max_device_num)> getDeviceList();
+        std::string getDeviceSerial(int index);
+        Device(const Device&) = delete;
+        Device& operator=(const Device&) = delete;
+    };
+}
 
 #endif //DEVICE_H

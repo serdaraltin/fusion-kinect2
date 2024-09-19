@@ -11,6 +11,7 @@ add_executable(fusion_vision
         src/logger/console_logger.cpp
         include/logger/logger.h
         lib/libfreenect2/logger.h
+        include/config/config.h
 )
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
