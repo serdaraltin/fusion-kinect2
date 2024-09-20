@@ -1,4 +1,5 @@
 #include "device/device.h"
+#include "libfreenect2/logger.h"
 #include "logger/console_logger.h"
 
 using namespace vision;
@@ -13,7 +14,14 @@ int main(int argc, char *argv[])
 {
     /* libfreenect2::Freenect2Device *device;
      libfreenect2::PacketPipeline *pipeline;*/
+    std::map<int,std::string> devices = deviceManager->getDeviceList();
 
-     consoleLogger->log(Logger::Info, "Vision Finised.");
-     return 0;
+    std::vector<int> indexs = {0};
+    auto selectDevice = deviceManager->selectDevices(indexs);
+    if(!selectDevice.first)
+    {
+        consoleLogger->log(Logger::Error, selectDevice.second);
+    }
+    consoleLogger->log(Logger::Info, "Vision Finised.");
+    return 0;
 }
