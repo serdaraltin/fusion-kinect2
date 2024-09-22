@@ -4,20 +4,23 @@
 
 #include "device/device_manager.h"
 #include "debug/status.h"
+#include "device/device.h"
 
 namespace vision
 {
+    DeviceManager* DeviceManager::instance = nullptr;
+
     DeviceManager::DeviceManager()
     {
         const int deviceCount = freenect2.enumerateDevices();
         if (deviceCount == 0)
         {
-            consoleLogger->log(Logger::Warning, "Device not found!");
+            console_logger->log(Logger::Warning, "Device not found!");
             return;
         }
         for (int i = 0; i < deviceCount; i++)
         {
-            deviceList.emplace_back(i,freenect2.getDeviceSerialNumber(i));
+            device_list.emplace_back(i,freenect2.getDeviceSerialNumber(i));
         }
 
     }
@@ -29,12 +32,12 @@ namespace vision
         return instance;
     }
 
-    std::vector<DeviceManager::Device> DeviceManager::getDeviceList()
+    std::vector<Device> DeviceManager::getDeviceList()
     {
-        return deviceList;
+        return device_list;
     }
 
-    DeviceManager::Device DeviceManager::getDevice(const int id)
+    Device DeviceManager::getDevice(const int id)
     {
         for(auto device: getDeviceList())
         {
@@ -49,11 +52,11 @@ namespace vision
         if(devices.empty())
             return {Status::InvalidParam, "List is empty!" };
 
-        consoleLogger->log(Logger::Info, "Listing DeviceManagers:");
+        console_logger->log(Logger::Info, "Listing Devices");
         for(auto device : devices)
         {
-            consoleLogger->log(Logger::Info,
-                std::format("DeviceManager {}: {}", device.id,device.serial));
+            console_logger->log(Logger::Info,
+                std::format("Device {}: {}", device.id,device.serial));
         }
         return {Status::Success, "Listing is successfull."};
     }
@@ -70,14 +73,14 @@ namespace vision
     {
         if (ids.empty())
             return   {Status::NotFound,"List is empty !"};
-        else if (ids.size() > deviceList.size())
+        else if (ids.size() > device_list.size())
             return {Status::InvalidParam, "Invalid index size !"};
 
         for (const int id : ids)
         {
             if (id < 0)
                 return {Status::InvalidParam, "Invalid index !"};
-            consoleLogger->log(Logger::Info,
+            console_logger->log(Logger::Info,
                 std::format("Selected DeviceManager {}: {}",
                     id ,getDevice(id).serial) );
         }

@@ -1,7 +1,3 @@
-//
-// Created by Serdar on 19.09.2024.
-//
-
 #ifndef DeviceManager_H
 #define DeviceManager_H
 
@@ -10,6 +6,7 @@
 #include <format>
 #include <utility>
 #include "debug/status.h"
+#include "device.h" // Include the new device header
 
 namespace vision
 {
@@ -22,58 +19,10 @@ namespace vision
      */
     class DeviceManager {
     private:
-        /**
-         * @struct Device
-         * @brief Holds device information.
-         *
-         * Stores the ID and serial number of each device.
-         */
-        struct Device
-        {
-            int id; ///< Device ID.
-            std::string serial; ///< Device serial number.
-
-            /**
-             * @brief Default constructor.
-             *
-             * Sets the ID to -1.
-             */
-            Device()
-                : id(-1) {}
-
-            /**
-             * @brief Parameterized constructor.
-             * @param id Device ID.
-             * @param serial Device serial number.
-             */
-            Device(const int id, std::string serial)
-                : id(id), serial(std::move(serial)) {}
-
-            /**
-             * @brief Equality operator.
-             * @param other Other Device object.
-             * @return true If the serial number is not empty.
-             * @return false Otherwise.
-             */
-            bool operator==(const Device& other) const
-            {
-                return !other.serial.empty();
-            }
-
-            /**
-             * @brief Boolean conversion operator.
-             * @return true If the serial number is not empty, false otherwise.
-             */
-            explicit operator bool() const
-            {
-                return !serial.empty();
-            }
-        };
-
-        ConsoleLogger* consoleLogger = ConsoleLogger::getInstance(); ///< Console logger instance.
+        ConsoleLogger* console_logger = ConsoleLogger::getInstance(); ///< Console logger instance.
         libfreenect2::Freenect2 freenect2; ///< Freenect2 library instance.
         int max_DeviceManager_num = 2; ///< Maximum number of Device Managers.
-        std::vector<Device> deviceList; ///< List of devices.
+        std::vector<Device> device_list; ///< List of devices.
         static DeviceManager* instance; ///< Singleton instance.
         DeviceManager(); ///< Private constructor.
 
@@ -130,4 +79,4 @@ namespace vision
     };
 }
 
-#endif //DeviceManager_H
+#endif // DeviceManager_H

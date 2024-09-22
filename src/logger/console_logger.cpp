@@ -14,6 +14,7 @@
 
 namespace vision
 {
+    ConsoleLogger* ConsoleLogger::instance;
     ConsoleLogger::ConsoleLogger()
     {
         level_ = Info;
