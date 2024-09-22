@@ -12,7 +12,7 @@ namespace vision
         const int deviceCount = freenect2.enumerateDevices();
         if (deviceCount == 0)
         {
-            consoleLogger->log(Logger::Warning, "DeviceManager not found!");
+            consoleLogger->log(Logger::Warning, "Device not found!");
             return;
         }
         for (int i = 0; i < deviceCount; i++)

@@ -14,14 +14,16 @@ namespace vision
     enum class Status
     {
         Success,
-        Error,
         Unsuccess,
+        Error,
+        EmptyParam,
+        EmptyData,
         InvalidParam,
         PermissionDenied,
         NotFound,
         Timeout,
         Conflict,
-        Pendind,
+        Pending,
         Cancelled
     };
 
