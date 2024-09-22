@@ -34,7 +34,7 @@ namespace vision
         return deviceList;
     }
 
-    DeviceManager::Device DeviceManager::getDevice(int id)
+    DeviceManager::Device DeviceManager::getDevice(const int id)
     {
         for(auto device: getDeviceList())
         {
