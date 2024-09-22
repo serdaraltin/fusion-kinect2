@@ -18,16 +18,36 @@ namespace vision
         }
         for (int i = 0; i < deviceCount; i++)
         {
-            device_list[i] = Device::freenect2.getDeviceSerialNumber(i);
+            deviceList[i] = Device::freenect2.getDeviceSerialNumber(i);
         }
 
+    }
+
+    std::pair<bool, std::string> Device::listDevices()
+    {
+        if(deviceList.empty())
+            return std::make_pair(false, std::string("No devices!"));
+
+        consoleLogger->log(Logger::Info, "Listing devices:");
+        for(auto device : deviceList)
+        {
+            consoleLogger->log(Logger::Info, std::format("Device {}: {}", device.first,device.second));
+        }
+        return std::make_pair(true, std::string("Listing is successfull."));
+    }
+
+    std::pair<bool, std::string> Device::openDevices(const std::vector<std::string>& devices)
+    {
+        if(deviceList.empty())
+            return std::make_pair(false, std::string("No devices!"));
+        return std::make_pair(true, std::string("Device(s) opened."));
     }
 
     std::pair<bool, std::string> Device::selectDevices(const std::vector<int> &indexs)
     {
         if (indexs.empty())
             return {false, "List is empty !"};
-        else if (indexs.size() > device_list.size())
+        else if (indexs.size() > deviceList.size())
             return {false, "Invalid index size !"};
 
         for (const int index : indexs)
@@ -35,7 +55,7 @@ namespace vision
             if (index < 0)
                 return {false, "Invalid index !"};
             consoleLogger->log(Logger::Info,
-                std::format("Selecting device -> Index: {} | Serial: {}",
+                std::format("Selected Device {}: {}",
                     index ,getDeviceSerial(index)) );
         }
         return {true, "Device selected."};;
@@ -51,11 +71,11 @@ namespace vision
 
     std::map<int, std::string> Device::getDeviceList()
     {
-        return Device::device_list;
+        return Device::deviceList;
     }
 
     std::string Device::getDeviceSerial(int index)
     {
-        return Device::device_list[index];
+        return Device::deviceList[index];
     }
 }

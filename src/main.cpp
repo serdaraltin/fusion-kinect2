@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 {
     /* libfreenect2::Freenect2Device *device;
      libfreenect2::PacketPipeline *pipeline;*/
-    std::map<int,std::string> devices = deviceManager->getDeviceList();
-
+    auto devices = deviceManager->getDeviceList();
+    deviceManager->listDevices();
     std::vector<int> indexs = {0};
     auto selectDevice = deviceManager->selectDevices(indexs);
     if(!selectDevice.first)

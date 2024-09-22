@@ -7,6 +7,10 @@
 #include <ostream>
 #include "logger/console_logger.h"
 #include "config/config.h"
+#include "cxxabi.h"
+#include "execinfo.h"
+#include <dlfcn.h>
+#include <cstring>
 
 namespace vision
 {
@@ -37,10 +41,10 @@ namespace vision
 
     void ConsoleLogger::log(Level level, const std::string& message)
     {
-
         if(level <= level_)
         {
             std::cout << std::format("[{}] [{}] {}",getLevelString(level), APP_NAME, message ) << std::endl;
         }
+
     }
 }

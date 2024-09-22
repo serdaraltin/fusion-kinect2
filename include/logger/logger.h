@@ -21,6 +21,7 @@ namespace vision
             Debug = 4,
         };
         virtual ~Logger() = default;
+//        virtual std::string backTree();
         virtual void log(Level level, const std::string &message) = 0;
         void setLevel(Level level);
         static Level getDefaultLevel();
