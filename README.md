@@ -2,7 +2,7 @@
 coming soon
 
 Todo
-- Device Listen - OK
-- Device Selection
+- DeviceManager Listen - OK
+- DeviceManager Selection
 - Logging System - OK
 - Preview Video Stream
