@@ -21,4 +21,6 @@
 #define VERSION_IS_RELEASE 0 ///< Indicates if the build is a release (1) or not (0).
 #define VERSION_IS_DEBUG 0 ///< Indicates if the build is a debug version (1) or not (0).
 
+#define DEFAULT_DEVICE_NAME "Kinect"
+
 #endif //CONFIG_H

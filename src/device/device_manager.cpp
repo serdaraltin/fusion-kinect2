@@ -5,13 +5,18 @@
 #include "device/device_manager.h"
 #include "debug/status.h"
 #include "device/device.h"
+#include "config/config.h"
 
 namespace vision
 {
     DeviceManager* DeviceManager::instance = nullptr;
 
+
     DeviceManager::DeviceManager()
     {
+        freenect2_device = nullptr;
+        freenect2_pipeline = new libfreenect2::CpuPacketPipeline();
+
         const int deviceCount = freenect2.enumerateDevices();
         if (deviceCount == 0)
         {
@@ -20,7 +25,7 @@ namespace vision
         }
         for (int i = 0; i < deviceCount; i++)
         {
-            device_list.emplace_back(i,freenect2.getDeviceSerialNumber(i));
+            device_list.emplace_back(i, std::format("{}-{}",DEFAULT_DEVICE_NAME,i));
         }
 
     }
@@ -34,17 +39,18 @@ namespace vision
 
     std::vector<Device> DeviceManager::getDeviceList()
     {
+        console_logger->log(Logger::Info, "Device manager started!");
         return device_list;
     }
 
     Device DeviceManager::getDevice(const int id)
     {
-        for(auto device: getDeviceList())
+        for(const auto& device: getDeviceList())
         {
-            if(device.id == id)
+            if(device.getId() == id)
                 return device;
         }
-        return {};
+        return device_list.front();
     }
 
     Result DeviceManager::listDevices(const std::vector<Device> &devices) const
@@ -53,10 +59,10 @@ namespace vision
             return {Status::InvalidParam, "List is empty!" };
 
         console_logger->log(Logger::Info, "Listing Devices");
-        for(auto device : devices)
+        for(const auto& device : devices)
         {
             console_logger->log(Logger::Info,
-                std::format("Device {}: {}", device.id,device.serial));
+                std::format("{}: {}", device.getNickName(), device.getId()));
         }
         return {Status::Success, "Listing is successfull."};
     }
@@ -65,8 +71,17 @@ namespace vision
     {
         if(devices.empty())
             return {Status::InvalidParam, std::string("List is empty!")};
-        //TODO fill this fuction
-        return {Status::Success, "DeviceManager(s) opened."};
+
+        console_logger->log(Logger::Info, "Opening Devices");
+        for(auto device : devices)
+        {
+            freenect2_device = freenect2.openDevice(device.getKinect2()->getSerialNumber(), freenect2_pipeline);
+            device.setOpen(freenect2_device);
+            console_logger->log(Logger::Info,
+                std::format("Device {}: {} is opened.",device.getId(),device.getKinect2()->getSerialNumber()));
+        }
+
+        return {Status::Success, "Device(s) opened."};
     }
 
     Result DeviceManager::selectDevices(const std::vector<int> &ids)
@@ -82,7 +97,7 @@ namespace vision
                 return {Status::InvalidParam, "Invalid index !"};
             console_logger->log(Logger::Info,
                 std::format("Selected DeviceManager {}: {}",
-                    id ,getDevice(id).serial) );
+                    id ,getDevice(id).getKinect2()->getSerialNumber()) );
         }
         return {Status::Success, "DeviceManager selected."};;
     }

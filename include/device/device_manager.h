@@ -19,13 +19,15 @@ namespace vision
      */
     class DeviceManager {
     private:
-        ConsoleLogger* console_logger = ConsoleLogger::getInstance(); ///< Console logger instance.
         libfreenect2::Freenect2 freenect2; ///< Freenect2 library instance.
+        libfreenect2::Freenect2Device *freenect2_device = nullptr; ///< Freenect2 library device manager instance.
+        libfreenect2::PacketPipeline *freenect2_pipeline = nullptr; ///< Freenect2 library packet pipeline instance.
+        ConsoleLogger* console_logger = ConsoleLogger::getInstance(); ///< Console logger instance.
         int max_DeviceManager_num = 2; ///< Maximum number of Device Managers.
         std::vector<Device> device_list; ///< List of devices.
         static DeviceManager* instance; ///< Singleton instance.
         DeviceManager(); ///< Private constructor.
-
+        ~DeviceManager()= default; ///< Private default destructor.
     public:
         /**
          * @brief Function to list devices.
@@ -39,7 +41,7 @@ namespace vision
          * @param devices List of devices to open.
          * @return Result Status of the operation.
          */
-        static Result openDevices(const std::vector<Device>& devices);
+        Result openDevices(const std::vector<Device>& devices);
 
         /**
          * @brief Function to select specific devices.
