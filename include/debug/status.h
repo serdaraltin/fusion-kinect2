@@ -72,6 +72,11 @@ namespace vision
         Result(const Status stat, std::string message, std::any& extraData)
             : status(stat), message(std::move(message)), data(extraData) {}
 
+        std::any* getData()
+        {
+            return std::any_cast<std::any*>(&data);
+        }
+
         /**
          * @brief Equality operator to compare Result objects.
          * @param rhs The Result object to compare against.

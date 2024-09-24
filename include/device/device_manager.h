@@ -10,13 +10,7 @@
 
 namespace vision
 {
-    /**
-     * @class DeviceManager
-     * @brief Class that manages devices.
-     *
-     * This class contains functions to list, open, and select devices.
-     * It is designed using the Singleton design pattern.
-     */
+
     class DeviceManager {
     private:
         libfreenect2::Freenect2 freenect2; ///< Freenect2 library instance.
@@ -27,56 +21,25 @@ namespace vision
         std::vector<Device> device_list; ///< List of devices.
         static DeviceManager* instance; ///< Singleton instance.
         DeviceManager(); ///< Private constructor.
-        ~DeviceManager()= default; ///< Private default destructor.
+        ~DeviceManager() = default; ///< Private default destructor.
     public:
-        /**
-         * @brief Function to list devices.
-         * @param devices Vector of device information.
-         * @return Result Status of the devices.
-         */
-        [[nodiscard]] Result listDevices(const std::vector<Device>& devices) const;
-
-        /**
-         * @brief Function to open devices.
-         * @param devices List of devices to open.
-         * @return Result Status of the operation.
-         */
+        bool listIsEmpty() const;
+        bool isDevice(int id) const;
+        Result newDevice(int id);
+        //Device getDevice(int id);
+        Result updateDevice(Device* device);
+        Result deleteDevice(Device* device);
+        Result checkDevice(Device* device);
+        Result startDevice(Device* device);
+        Result stopDevice(Device* device);
+        Result resetDevice(Device* device);
+        static Device* castToDevice(const std::any& data);
+        Result listDevices(const std::vector<Device>& devices) const;
         Result openDevices(const std::vector<Device>& devices);
-
-        /**
-         * @brief Function to select specific devices.
-         * @param id IDs of devices to be selected.
-         * @return Result Status of the selection.
-         */
-        Result selectDevices(const std::vector<int>& id);
-
-        /**
-         * @brief Function to get the singleton instance.
-         * @return DeviceManager* Pointer to the device manager instance.
-         */
+        Result selectDevices(const std::vector<int>& id) const;
         static DeviceManager* getInstance();
-
-        /**
-         * @brief Function to get the list of devices.
-         * @return std::vector<Device> List of devices.
-         */
-        std::vector<Device> getDeviceList();
-
-        /**
-         * @brief Function to get a specific device.
-         * @param id Device ID.
-         * @return Device Information of the relevant device.
-         */
-        Device getDevice(int id);
-
-        /**
-         * @brief Disables the copy constructor.
-         */
+        std::vector<Device> getDeviceList() const;
         DeviceManager(const DeviceManager&) = delete;
-
-        /**
-         * @brief Disables the assignment operator.
-         */
         DeviceManager& operator=(const DeviceManager&) = delete;
     };
 }

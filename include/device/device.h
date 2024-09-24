@@ -27,6 +27,8 @@ namespace vision
     public:
         Device();
 
+        //Device(const Device& other);
+
         ~Device() = default;
 
         Device(const int id, std::string  nick_name)
@@ -59,7 +61,6 @@ namespace vision
         {
             return kinect2 != nullptr;
         }
-
 
         [[nodiscard]] int getId() const
         {
@@ -100,7 +101,6 @@ namespace vision
         {
             this->kinect2 = kinect2;
         }
-
 
     };
 }

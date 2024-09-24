@@ -3,6 +3,10 @@
 //
 
 #include "device/device_manager.h"
+
+#include <algorithm>
+#include <memory>
+
 #include "debug/status.h"
 #include "device/device.h"
 #include "config/config.h"
@@ -11,23 +15,33 @@ namespace vision
 {
     DeviceManager* DeviceManager::instance = nullptr;
 
-
     DeviceManager::DeviceManager()
     {
         freenect2_device = nullptr;
         freenect2_pipeline = new libfreenect2::CpuPacketPipeline();
 
-        const int deviceCount = freenect2.enumerateDevices();
-        if (deviceCount == 0)
+        if (const int device_count = freenect2.enumerateDevices(); device_count == 0)
         {
             console_logger->log(Logger::Warning, "Device not found!");
             return;
         }
-        for (int i = 0; i < deviceCount; i++)
-        {
-            device_list.emplace_back(i, std::format("{}-{}",DEFAULT_DEVICE_NAME,i));
-        }
+    }
 
+
+
+    bool DeviceManager::listIsEmpty() const
+    {
+        return device_list.empty();
+    }
+
+    bool DeviceManager::isDevice(const int id) const
+    {
+        for(auto& device : device_list)
+        {
+            if(device.getId() == id)
+                return true;
+        }
+        return false;
     }
 
     DeviceManager* DeviceManager::getInstance()
@@ -36,21 +50,87 @@ namespace vision
             instance = new DeviceManager();
         return instance;
     }
-
-    std::vector<Device> DeviceManager::getDeviceList()
+    Device* DeviceManager::castToDevice(const std::any& data)
     {
-        console_logger->log(Logger::Info, "Device manager started!");
-        return device_list;
+        try
+        {
+            return  std::any_cast<Device*>(data);
+        }catch (const std::bad_any_cast&)
+        {
+            return nullptr;
+        }
     }
 
-    Device DeviceManager::getDevice(const int id)
+    Result DeviceManager::newDevice(const int id)
     {
-        for(const auto& device: getDeviceList())
+        if(freenect2.getDeviceSerialNumber(id).empty())
+            return {Status::InvalidParam, "Device not found!"};
+        if(isDevice(id))
+            return {Status::Cancelled, "Device already exists."};
+        device_list.emplace_back(
+            id,
+            freenect2.getDeviceSerialNumber(id),
+            nullptr);
+
+        return {Status::Success, "New device added."};
+    }
+
+   /* Device DeviceManager::getDevice(const int id)
+    {
+        if(listIsEmpty())
+            return {};
+
+        for(const auto& device : device_list)
         {
             if(device.getId() == id)
+            {
                 return device;
+            }
         }
-        return device_list.front();
+
+        return {};
+    }*/
+
+    Result DeviceManager::updateDevice(Device* device)
+    {
+        if(listIsEmpty())
+            return {Status::Unsuccess, "Device list empty!"};
+
+        return {Status::Success, "Operation is successfull."};
+    }
+
+    Result DeviceManager::deleteDevice(Device* device)
+    {
+        return {Status::Success, "Operation is successfull."};
+    }
+
+    Result DeviceManager::checkDevice(Device* device)
+    {
+        return {Status::Success, "Operation is successfull."};
+    }
+
+    Result DeviceManager::startDevice(Device* device)
+    {
+        return {Status::Success, "Operation is successfull."};
+    }
+
+    Result DeviceManager::stopDevice(Device* device)
+    {
+        return {Status::Success, "Operation is successfull."};
+    }
+
+    Result DeviceManager::resetDevice(Device* device)
+    {
+        return {Status::Success, "Operation is successfull."};
+    }
+
+
+
+    std::vector<Device> DeviceManager::getDeviceList() const
+    {
+        console_logger->log(Logger::Info, "Device manager started!");
+
+        return device_list;
     }
 
     Result DeviceManager::listDevices(const std::vector<Device> &devices) const
@@ -73,31 +153,36 @@ namespace vision
             return {Status::InvalidParam, std::string("List is empty!")};
 
         console_logger->log(Logger::Info, "Opening Devices");
-        for(auto device : devices)
+        /*for(auto device : devices)
         {
-            freenect2_device = freenect2.openDevice(device.getKinect2()->getSerialNumber(), freenect2_pipeline);
+            std::unique_ptr<libfreenect2::Freenect2Device> new_device(
+                freenect2.openDevice(device.getKinect2()->getSerialNumber(), freenect2_pipeline));
+
+
+            getDeviceList().emplace_back(
+                0,
+                std::format("{}-{}",DEFAULT_DEVICE_NAME,getDeviceList().size()),
+                std::move(new_device).get());
+
             device.setOpen(freenect2_device);
             console_logger->log(Logger::Info,
                 std::format("Device {}: {} is opened.",device.getId(),device.getKinect2()->getSerialNumber()));
-        }
+        }*/
 
         return {Status::Success, "Device(s) opened."};
     }
 
-    Result DeviceManager::selectDevices(const std::vector<int> &ids)
+    Result DeviceManager::selectDevices(const std::vector<int> &ids) const
     {
         if (ids.empty())
             return   {Status::NotFound,"List is empty !"};
-        else if (ids.size() > device_list.size())
+        else if (ids.size() > getDeviceList().size())
             return {Status::InvalidParam, "Invalid index size !"};
 
         for (const int id : ids)
         {
             if (id < 0)
                 return {Status::InvalidParam, "Invalid index !"};
-            console_logger->log(Logger::Info,
-                std::format("Selected DeviceManager {}: {}",
-                    id ,getDevice(id).getKinect2()->getSerialNumber()) );
         }
         return {Status::Success, "DeviceManager selected."};;
     }
