@@ -19,7 +19,8 @@ namespace vision
     class Device
     {
     private:
-        int id = -1;
+        int idx = -1;
+        std::string serial;
         std::string nick_name;
         bool open_status = false;
         libfreenect2::Freenect2Device* kinect2 = nullptr;
@@ -31,22 +32,45 @@ namespace vision
 
         ~Device() = default;
 
-        Device(const int id, std::string  nick_name)
-            : id(id), nick_name(std::move(nick_name)){}
+        explicit Device(int idx)
+            : idx(idx)
+        {
+        }
 
-        Device(const int id, std::string  nick_name, const bool open_status, libfreenect2::Freenect2Device* kinect2)
-            : id(id),nick_name(std::move(nick_name)),open_status(open_status),kinect2(kinect2){}
+        Device(int idx, const std::string& serial)
+            : idx(idx),
+              serial(serial)
+        {
+        }
 
-        Device(const int id, std::string  nick_name, libfreenect2::Freenect2Device* kinect2)
-            : id(id),
-              nick_name(std::move(nick_name)),
+        Device(int idx, const std::string& serial, const std::string& nick_name)
+            : idx(idx),
+              serial(serial),
+              nick_name(nick_name)
+        {
+        }
+
+        Device(int idx, const std::string& serial, const std::string& nick_name, libfreenect2::Freenect2Device* kinect2)
+            : idx(idx),
+              serial(serial),
+              nick_name(nick_name),
+              kinect2(kinect2)
+        {
+        }
+
+        Device(int idx, const std::string& serial, const std::string& nick_name, bool open_status,
+            libfreenect2::Freenect2Device* kinect2)
+            : idx(idx),
+              serial(serial),
+              nick_name(nick_name),
+              open_status(open_status),
               kinect2(kinect2)
         {
         }
 
         friend bool operator==(const Device& lhs, const Device& rhs)
         {
-            return lhs.id == rhs.id
+            return lhs.idx == rhs.idx
                 && lhs.nick_name == rhs.nick_name
                 && lhs.open_status == rhs.open_status
                 && lhs.kinect2 == rhs.kinect2;
@@ -62,9 +86,9 @@ namespace vision
             return kinect2 != nullptr;
         }
 
-        [[nodiscard]] int getId() const
+        [[nodiscard]] int getIdx() const
         {
-            return id;
+            return idx;
         }
 
         [[nodiscard]] std::string getNickName() const
@@ -82,9 +106,19 @@ namespace vision
             return kinect2;
         }
 
-        void setId(const int id)
+        [[nodiscard]] std::string getSerial() const
         {
-            this->id = id;
+            return serial;
+        }
+
+        void setSerial(const std::string& serial)
+        {
+            this->serial = serial;
+        }
+
+        void setIdx(const int idx)
+        {
+            this->idx = idx;
         }
 
         void setNickName(const std::string& nick_name)

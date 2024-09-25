@@ -25,19 +25,23 @@ namespace vision
         ~DeviceManager() = default;
 
 
-        Device* createDevice(int device_id);
+        /*Device* createDevice(int device_id);
         bool updateDevice(Device* device);
-        bool deleteDevice(Device* device);
-        std::optional<int> findDeviceIndex(int device_id) const;
+        bool deleteDevice(Device* device);*/
+
+        [[nodiscard]] static std::optional<int> findDeviceIndex(
+            std::vector<Device> _devices, int device_id);
 
 
-        bool checkDevice(int device_id) const;
+        bool checkDevice(int device_id);
+        /*
         bool startDevice(int device_id);
         bool stopDevice(int device_id);
         bool resetDevice(int device_id);
-        bool openDevice(int device_id);
+        bool openDevice(int device_id);*/
 
         std::vector<Device> enumerateDevices();
+
 
     public:
 
@@ -46,19 +50,20 @@ namespace vision
         DeviceManager(const DeviceManager&) = delete;
         DeviceManager& operator=(const DeviceManager&) = delete;
 
-        std::optional<Device> getDevice(int id);  // Uses std::optional to handle non-existence
-
-
-        std::vector<Device> getDeviceList() const;
-        Result logDevicesList() const;
-        bool deviceListIsEmpty() const;
+        std::optional<Device> getDevice(int device_id);
+        //std::optional<Device> getDevice(std::string device_serial);
+        [[nodiscard]] int availableDeviceCount();
+        [[nodiscard]] std::vector<Device> getDeviceList() const;
+        [[nodiscard]] Result logDevicesList() const;
+        [[nodiscard]] bool deviceListIsEmpty() const;
         Result refreshDeviceList();
 
         // Selected List operations
-        bool selectDevice(const Device& device);
-        bool deselectDevice(const Device& device);
-        bool clearSelectedList() const;
-        bool selectedListIsEmpty() const;
+        bool selectDevice(int device_id);
+        //bool selectDevice(std::string device_serial);
+        bool deselectDevice(int device_id);
+        void clearSelectedList();
+        [[nodiscard]] bool selectedListIsEmpty() const;
 
 
         // Device-specific streaming and sensor data management
