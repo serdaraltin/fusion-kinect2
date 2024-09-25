@@ -6,12 +6,8 @@
 
 #include <algorithm>
 #include <format>
-#include <memory>
-#include <bits/fs_path.h>
-
 #include "debug/status.h"
 #include "device/device.h"
-#include "config/config.h"
 
 namespace vision
 {
@@ -93,12 +89,10 @@ namespace vision
 
     std::optional<int> DeviceManager::findDeviceIndex(std::vector<Device> _devices, int device_id)
     {
-        const auto it = std::find_if(
-            _devices.begin(),
-            _devices.end(),
-            [device_id] (const Device& device) -> bool{
-                return device.getIdx() == device_id;
-            });
+        const auto it = std::ranges::find_if(_devices,
+        [device_id] (const Device& device) -> bool{
+            return device.getIdx() == device_id;
+        });
 
         if(it != _devices.end())
         {
@@ -107,12 +101,12 @@ namespace vision
         return std::nullopt;
     }
 
-    bool DeviceManager::checkDevice(int device_id)
+    bool DeviceManager::checkDevice(const int device_id)
     {
         return !freenect2.getDeviceSerialNumber(device_id).empty();
     }
 
-    std::optional<Device> DeviceManager::getDevice(int device_id)
+    std::optional<Device> DeviceManager::getDevice(const int device_id)
     {
         if(!availableDeviceCount())
         {
@@ -134,7 +128,7 @@ namespace vision
         return selected_devices.empty();
     }
 
-    bool DeviceManager::selectDevice(int device_id)
+    bool DeviceManager::selectDevice(const int device_id)
     {
         const auto _device = getDevice(device_id);
         if(_device == std::nullopt)
@@ -151,10 +145,11 @@ namespace vision
     {
         if(!checkDevice(device_id))
             return false;
-        const auto it = std::find_if(
-            std::begin(devices),
-            std::end(devices),
-            selected_devices);
+        const auto it = std::ranges::find_if(selected_devices,
+        [device_id] (const Device& device) -> bool
+        {
+            return device.getIdx() == device_id;
+        });
 
         if(it != std::end(devices))
         {
