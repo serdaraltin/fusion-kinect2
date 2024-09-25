@@ -3,10 +3,9 @@
 
 #include "libfreenect2/libfreenect2.hpp"
 #include "logger/console_logger.h"
-#include <format>
-#include <utility>
 #include "debug/status.h"
-#include "device.h" // Include the new device header
+#include "device.h" // Device header
+#include <optional>  // C++17 feature for optional return types
 
 namespace vision
 {
@@ -17,31 +16,63 @@ namespace vision
         libfreenect2::Freenect2Device *freenect2_device = nullptr; ///< Freenect2 library device manager instance.
         libfreenect2::PacketPipeline *freenect2_pipeline = nullptr; ///< Freenect2 library packet pipeline instance.
         ConsoleLogger* console_logger = ConsoleLogger::getInstance(); ///< Console logger instance.
-        int max_DeviceManager_num = 2; ///< Maximum number of Device Managers.
-        std::vector<Device> device_list; ///< List of devices.
+        std::vector<Device> devices; ///< List of devices.
+        std::vector<Device> selected_devices;
         static DeviceManager* instance; ///< Singleton instance.
-        DeviceManager(); ///< Private constructor.
-        ~DeviceManager() = default; ///< Private default destructor.
+
+        // Private constructor and destructor for Singleton pattern
+        DeviceManager();
+        ~DeviceManager() = default;
+
+
+        Device* createDevice(int device_id);
+        bool updateDevice(Device* device);
+        bool deleteDevice(Device* device);
+        std::optional<int> findDeviceIndex(int device_id) const;
+
+
+        bool checkDevice(int device_id) const;
+        bool startDevice(int device_id);
+        bool stopDevice(int device_id);
+        bool resetDevice(int device_id);
+        bool openDevice(int device_id);
+
+        std::vector<Device> enumerateDevices();
+
     public:
-        bool listIsEmpty() const;
-        bool isDevice(int id) const;
-        Result newDevice(int id);
-        //Device getDevice(int id);
-        Result updateDevice(Device* device);
-        Result deleteDevice(Device* device);
-        Result checkDevice(Device* device);
-        Result startDevice(Device* device);
-        Result stopDevice(Device* device);
-        Result resetDevice(Device* device);
-        static Device* castToDevice(const std::any& data);
-        Result listDevices(const std::vector<Device>& devices) const;
-        Result openDevices(const std::vector<Device>& devices);
-        Result selectDevices(const std::vector<int>& id) const;
+
         static DeviceManager* getInstance();
-        std::vector<Device> getDeviceList() const;
+
         DeviceManager(const DeviceManager&) = delete;
         DeviceManager& operator=(const DeviceManager&) = delete;
+
+        std::optional<Device> getDevice(int id);  // Uses std::optional to handle non-existence
+
+
+        std::vector<Device> getDeviceList() const;
+        Result logDevicesList() const;
+        bool deviceListIsEmpty() const;
+        Result refreshDeviceList();
+
+        // Selected List operations
+        bool selectDevice(const Device& device);
+        bool deselectDevice(const Device& device);
+        bool clearSelectedList() const;
+        bool selectedListIsEmpty() const;
+
+
+        // Device-specific streaming and sensor data management
+        Result startVideoStream(int device_id);   // Start video stream
+        Result stopVideoStream(int device_id);    // Stop video stream
+        Result startDepthStream(int device_id);   // Start depth stream
+        Result stopDepthStream(int device_id);    // Stop depth stream
+        Result enableIRStream(int device_id);     // Enable IR stream
+        Result disableIRStream(int device_id);    // Disable IR stream
+        Result captureFrame(int device_id);       // Capture a single frame from device
+
     };
+
+
 }
 
 #endif // DeviceManager_H

@@ -12,7 +12,7 @@ ConsoleLogger* console_logger = ConsoleLogger::getInstance();
 
 int main(int argc, char *argv[])
 {
-    auto list_result = device_manager->listDevices(device_manager->getDeviceList());
+    auto list_result = device_manager->listDevices(device_manager->getList());
 
     //device_manager->openDevices(device_manager->getDeviceList());
 
