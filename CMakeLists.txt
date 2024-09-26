@@ -11,18 +11,27 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/lib      # Include path for library headers
 )
 
+file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")
+file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")
+file(GLOB_RECURSE TEST_SOURCE "tests/**/*.cpp")
+file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")
+
+set(MAIN_FILE src/main.cpp)
+
+if (NOT MAIN_SOURCE OR NOT TEST_SOURCE OR NOT HEADER_SOURCE)
+    message(FATAL_ERROR "Source files not found!")
+endif()
+
+message(STATUS "Source files: ${SOURCE_FILES}")
+message(STATUS "Test files: ${TEST_FILES}")
+message(STATUS "Header files: ${HEADER_FILES}")
 
 # Define the main executable for the project
 add_executable(fusion_vision
-        src/main.cpp
-        src/device/device_manager.cpp
-        include/device/device_manager.h
-        include/logger/console_logger.h
-        src/logger/console_logger.cpp
-        include/logger/logger.h
-        lib/libfreenect2/logger.h
-        include/config/config.h
-        include/debug/status.h
+        ${MAIN_FILE}
+        ${MAIN_SOURCE}
+        ${HEADER_SOURCE}
+        ${LIB_SOURCE}
 )
 
 # Locate the Freenect2 library
@@ -63,10 +72,13 @@ FetchContent_Declare(
 # Make Catch2 available for the project
 FetchContent_MakeAvailable(catch2)
 
+
 # Define a separate executable for unit tests using Catch2
 add_executable(fusion_vision_test
-        tests/device/device_manager_test.cpp
-        include/device/device.h)
+        ${HEADER_SOURCE}
+        ${SOURCE_SOURCE}
+        ${TEST_SOURCE}
+)
 target_link_libraries(fusion_vision_test PRIVATE Catch2::Catch2)  # Link Catch2 for testing
 enable_testing()
 add_test(NAME DeviceManager COMMAND fusion_vision_test)

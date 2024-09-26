@@ -1,9 +1,6 @@
 #include "../cmake-build-debug/_deps/catch2-src/single_include/catch2/catch.hpp"
 #include "device/device_manager.h"
-#include "libfreenect2/logger.h"
 #include "logger/console_logger.h"
-#include "debug/status.h"
-#include "device/device.h"
 
 using namespace vision;
 

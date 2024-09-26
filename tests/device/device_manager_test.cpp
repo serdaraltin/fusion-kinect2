@@ -5,16 +5,14 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include "device/device_manager.h"
-#include "device/device.h"
-#include "debug/status.h"
-
 
 namespace vision
 {
-    TEST_CASE("DeviceManager Singleton Instance", "[DeviceManager]") {
+    DeviceManager* manager1 = DeviceManager::getInstance();
+    DeviceManager* manager2 = DeviceManager::getInstance();
+    ConsoleLogger* console_logger = ConsoleLogger::getInstance();
 
-        DeviceManager* manager1 = DeviceManager::getInstance();
-        DeviceManager* manager2 = DeviceManager::getInstance();
+    TEST_CASE("DeviceManager Singleton Instance", "[DeviceManager]") {
 
         REQUIRE(manager1 != nullptr);
         REQUIRE(manager2 != nullptr);

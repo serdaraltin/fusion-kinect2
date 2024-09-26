@@ -46,7 +46,6 @@ namespace vision
     public:
 
         static DeviceManager* getInstance();
-
         DeviceManager(const DeviceManager&) = delete;
         DeviceManager& operator=(const DeviceManager&) = delete;
 
