@@ -7,24 +7,60 @@
 
 namespace vision
 {
-
-
-
-    TEST(DeviceManager, SingletonInstance) {
-        DeviceManager* manager1 = DeviceManager::getInstance();
-        DeviceManager* manager2 = DeviceManager::getInstance();
-        EXPECT_NE(manager1, nullptr);
-        EXPECT_NE(manager2, nullptr);
-        EXPECT_EQ(manager1, manager2);
-    }
-
-    TEST(ConsoleLogger, SingletonInstance){
+    TEST(ConsoleLogger, getInstance){
         ConsoleLogger* console_logger1 = ConsoleLogger::getInstance();
         ConsoleLogger* console_logger2= ConsoleLogger::getInstance();
         EXPECT_NE(console_logger1, nullptr);
         EXPECT_NE(console_logger2, nullptr);
         EXPECT_EQ(console_logger1,console_logger2);
     }
+
+    TEST(DeviceManager, getInstance) {
+        DeviceManager* device_manager1 = DeviceManager::getInstance();
+        DeviceManager* device_manager2 = DeviceManager::getInstance();
+        EXPECT_NE(device_manager1, nullptr);
+        EXPECT_NE(device_manager2, nullptr);
+        EXPECT_EQ(device_manager1, device_manager2);
+    }
+
+    TEST(DeviceManager, availableDeviceCount) {
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        int freenect_enumerate = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices();
+        int dm_enumerate = device_manager->availableDeviceCount();
+        //GTEST_LOG_(INFO) << "Freenect EnumerateDevices Count: " << freenect_enumerate << std::endl;
+        //GTEST_LOG_(INFO) << "Device Manager EnumerateDevices Count: " << dm_enumerate << std::endl;
+        EXPECT_EQ(dm_enumerate, freenect_enumerate);
+    }
+
+    TEST(DeviceManager, getDeviceList) {
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        int enum_device = device_manager->availableDeviceCount();
+        int device_count = device_manager->getDeviceList().size();
+        EXPECT_EQ(enum_device, device_count);
+    }
+
+    TEST(DeviceManager, logDeviceList) {
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        auto result = device_manager->logDevicesList();
+        EXPECT_NE(result.status, Status::Error);
+    }
+
+    TEST(DeviceManager, deviceListIsEmpty) {
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        bool freenect_result = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices() == 0;
+        bool result = device_manager->deviceListIsEmpty();
+        EXPECT_EQ(freenect_result, result);
+    }
+
+    TEST(DeviceManager, refreshDeviceList) {
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        int freenect_enumerate = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices();
+        device_manager->refreshDeviceList();
+        int dm_enum = device_manager->availableDeviceCount();
+        EXPECT_EQ(freenect_enumerate, dm_enum);
+    }
+
+
 
     int main(int argc, char **argv){
         testing::InitGoogleTest(&argc, argv);
