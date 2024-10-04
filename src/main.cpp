@@ -1,6 +1,6 @@
-#include "../cmake-build-debug/_deps/catch2-src/single_include/catch2/catch.hpp"
 #include "device/device_manager.h"
 #include "logger/console_logger.h"
+#include <opencv2/opencv.hpp>
 
 using namespace vision;
 
@@ -11,8 +11,7 @@ int main(int argc, char *argv[])
 {
 
 
-    //device_manager->openDevices(device_manager->getDeviceList());
-
     console_logger->log(Logger::Info, "Vision Finised.");
     return 0;
 }
+

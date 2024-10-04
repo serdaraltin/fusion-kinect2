@@ -1,86 +1,106 @@
 cmake_minimum_required(VERSION 3.29)
-project(fusion_vision)
 
 # Set the C++ standard to C++20
 set(CMAKE_CXX_STANDARD 20)
 
-#------------------------------- BUILD -------------------------------
-# Include directories for header files
+#------------------------------- PROJECT SETUP -------------------------------
+
+# Define project name
+project(fusion_vision)
+
+# Find necessary packages
+find_package(OpenGL REQUIRED)        # OpenGL for graphics rendering
+find_package(glfw3 REQUIRED)         # GLFW for creating windows and OpenGL contexts
+find_package(OpenCV REQUIRED)        # OpenCV for computer vision functionalities
+
+# Add include directories (for headers and external libraries)
 include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/include  # Include path for project headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib      # Include path for library headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/include  # Custom include directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib      # Custom libraries directory
+        ${OpenCV_INCLUDE_DIRS}               # OpenCV include directories
 )
 
-file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")
-file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")
-file(GLOB_RECURSE TEST_SOURCE "tests/**/*.cpp")
-file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")
+#------------------------------- FILE GLOBBING -------------------------------
 
+# Recursively gather all source, header, and test files
+file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")  # Header files in include/
+file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")      # Source files in src/
+file(GLOB_RECURSE TEST_SOURCE "tests/**/*.cpp")    # Test files in tests/
+file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")         # Library headers in lib/
+
+# Main application entry point
 set(MAIN_FILE src/main.cpp)
 
-if (NOT MAIN_SOURCE OR NOT TEST_SOURCE OR NOT HEADER_SOURCE)
+# Output status messages for debugging
+message(STATUS "Source files: ${MAIN_SOURCE}")
+message(STATUS "Test files: ${TEST_SOURCE}")
+message(STATUS "Header files: ${HEADER_SOURCE}")
+
+# Ensure that source, header, and library files are present
+if (NOT MAIN_SOURCE OR NOT LIB_SOURCE OR NOT HEADER_SOURCE)
     message(FATAL_ERROR "Source files not found!")
 endif()
 
-message(STATUS "Source files: ${SOURCE_FILES}")
-message(STATUS "Test files: ${TEST_FILES}")
-message(STATUS "Header files: ${HEADER_FILES}")
+#------------------------------- MAIN EXECUTABLE -------------------------------
 
-# Define the main executable for the project
+# Define the main application executable
 add_executable(fusion_vision
-        ${MAIN_FILE}
-        ${MAIN_SOURCE}
-        ${HEADER_SOURCE}
-        ${LIB_SOURCE}
+        ${MAIN_FILE}       # Entry point
+        ${MAIN_SOURCE}     # All source files
+        ${HEADER_SOURCE}   # All header files
+        ${LIB_SOURCE}      # All library headers
 )
 
-# Locate the Freenect2 library
-find_library(FREENECT2_LIBRARY freenect2 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+# Find the Freenect2 library (for Kinect2 sensor)
+find_library(FREENECT2_LIB freenect2 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
+# Link the libraries to the main executable
 target_link_libraries(fusion_vision
-        ${FREENECT2_LIBRARY}  # Link the Freenect2 library
+        ${FREENECT2_LIB}   # Kinect2 support
+        ${OpenCV_LIBS}     # OpenCV libraries
 )
 
-# Find and link required libraries
-find_package(OpenGL REQUIRED)  # OpenGL
-find_package(glfw3 REQUIRED)    # GLFW
-
-# Link libraries to the main executable
-target_link_libraries(fusion_vision
-        ${OpenCV_LIBS}            # OpenCV libraries
-        ${FREENECT2_LIB}         # Freenect2 libraries
-)
-
-# Find and include OpenCV
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})  # Include OpenCV headers
-
-#------------------------------- BUILD -------------------------------
+#------------------------------- BUILD CONFIGURATION -------------------------------
 
 
-#------------------------------- UNIT TEST ---------------------------
+#------------------------------- UNIT TEST SETUP -------------------------------
 
-# Include FetchContent module for downloading external dependencies
+# Fetch and include GoogleTest for unit testing
 include(FetchContent)
-
-# Fetch and configure Catch2 for unit testing
 FetchContent_Declare(
-        catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v2.x  # Specify the version of Catch2
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
 
-# Make Catch2 available for the project
-FetchContent_MakeAvailable(catch2)
+# Ensure shared CRT for cross-library compatibility
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+# Download and make GoogleTest available
+FetchContent_MakeAvailable(googletest)
 
-# Define a separate executable for unit tests using Catch2
-add_executable(fusion_vision_test
-        ${HEADER_SOURCE}
-        ${SOURCE_SOURCE}
-        ${TEST_SOURCE}
+# Define the main test file entry point
+set(MAIN_TEST_FILE tests/main_test.cpp)
+
+# Define the test executable
+add_executable(unit_test
+        ${MAIN_TEST_FILE}   # Main test file
+        ${MAIN_SOURCE}      # All source files
+        ${HEADER_SOURCE}    # All header files
+        ${LIB_SOURCE}       # All library headers
 )
-target_link_libraries(fusion_vision_test PRIVATE Catch2::Catch2)  # Link Catch2 for testing
+
+# Link GoogleTest and other necessary libraries to the test executable
+target_link_libraries(unit_test
+        PRIVATE
+        GTest::gtest_main   # GoogleTest main function
+        ${OpenCV_LIBS}      # OpenCV libraries
+        ${FREENECT2_LIB}    # Kinect2 support
+)
+
+# Enable testing support in CMake
 enable_testing()
-add_test(NAME DeviceManager COMMAND fusion_vision_test)
 
-#------------------------------- UNIT TEST ---------------------------
+# Define a general test case
+add_test(NAME GeneralTest COMMAND unit_test)
+
+#------------------------------- UNIT TEST SETUP -------------------------------
