@@ -93,6 +93,17 @@ namespace vision
         EXPECT_TRUE(result);
     }
 
+    TEST(DeviceManager, findDeviceIndex) {
+        DeviceManager *device_manager = DeviceManager::getInstance();
+        if(!device_manager->availableDeviceCount()){
+            GTEST_LOG_(INFO) << "Device not found !" << std::endl;
+            GTEST_SKIP();
+        }
+        auto device_list = device_manager->getDeviceList();
+        std::optional<int> index = vision::DeviceManager::findDeviceIndex(device_list, 0);
+        EXPECT_TRUE(index);
+    }
+
 
     int main(int argc, char **argv){
         testing::InitGoogleTest(&argc, argv);

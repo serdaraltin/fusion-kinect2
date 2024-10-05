@@ -6,6 +6,7 @@
 #include "debug/status.h"
 #include "device.h" // Device header
 #include <optional>  // C++17 feature for optional return types
+#include "gtest/gtest.h"
 
 namespace vision
 {
@@ -32,6 +33,7 @@ namespace vision
         [[nodiscard]] static std::optional<int> findDeviceIndex(
             std::vector<Device> _devices, int device_id);
 
+        FRIEND_TEST(DeviceManager, findDeviceIndex);
 
         bool checkDevice(int device_id);
         /*
@@ -44,7 +46,6 @@ namespace vision
 
 
     public:
-
         static DeviceManager* getInstance();
         DeviceManager(const DeviceManager&) = delete;
         DeviceManager& operator=(const DeviceManager&) = delete;
