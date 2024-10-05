@@ -165,6 +165,11 @@ namespace vision
         selected_devices.clear();
     }
 
+    std::vector<Device> DeviceManager::getSelectedDeviceList() const{
+        return selected_devices;
+    }
+
+
 
 
 

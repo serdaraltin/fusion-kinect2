@@ -27,8 +27,6 @@ namespace vision
         DeviceManager* device_manager = DeviceManager::getInstance();
         int freenect_enumerate = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices();
         int dm_enumerate = device_manager->availableDeviceCount();
-        //GTEST_LOG_(INFO) << "Freenect EnumerateDevices Count: " << freenect_enumerate << std::endl;
-        //GTEST_LOG_(INFO) << "Device Manager EnumerateDevices Count: " << dm_enumerate << std::endl;
         EXPECT_EQ(dm_enumerate, freenect_enumerate);
     }
 
@@ -60,13 +58,38 @@ namespace vision
         EXPECT_EQ(freenect_enumerate, dm_enum);
     }
 
+    TEST(DeviceManager, getSelectedDeviceList){
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        device_manager->clearSelectedList();
+        EXPECT_TRUE(device_manager->getSelectedDeviceList().empty());
+
+    }
+
     TEST(DeviceManager, selectDevice){
         DeviceManager* device_manager = DeviceManager::getInstance();
-        int dm_enumerate = device_manager->availableDeviceCount();
-        EXPECT_GT(dm_enumerate, 0);
-        auto device_list = device_manager->getDeviceList();
-        EXPECT_GT(device_list.size(), 0);
-        bool result = device_manager->selectDevice(0);
+        if(!device_manager->availableDeviceCount()){
+            GTEST_LOG_(INFO) << "Device not found !" << std::endl;
+            GTEST_SKIP();
+        }
+        bool result = device_manager->selectDevice(device_manager->getDeviceList()[0].getIdx());
+        EXPECT_TRUE(result);
+    }
+
+    TEST(DeviceManager, selectListIsEmpty){
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        device_manager->clearSelectedList();
+        EXPECT_TRUE(device_manager->selectedListIsEmpty());
+    }
+
+    TEST(DeviceManager, deselectDevice){
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        if(!device_manager->availableDeviceCount()){
+            GTEST_LOG_(INFO) << "Device not found !" << std::endl;
+            GTEST_SKIP();
+        }
+
+        device_manager->selectDevice(device_manager->getDeviceList()[0].getIdx());
+        bool result = device_manager->deselectDevice(0);
         EXPECT_TRUE(result);
     }
 
