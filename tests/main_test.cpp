@@ -35,7 +35,7 @@ namespace vision
     TEST(DeviceManager, getDeviceList) {
         DeviceManager* device_manager = DeviceManager::getInstance();
         int enum_device = device_manager->availableDeviceCount();
-        int device_count = device_manager->getDeviceList().size();
+        unsigned int device_count = device_manager->getDeviceList().size();
         EXPECT_EQ(enum_device, device_count);
     }
 
@@ -47,8 +47,8 @@ namespace vision
 
     TEST(DeviceManager, deviceListIsEmpty) {
         DeviceManager* device_manager = DeviceManager::getInstance();
-        bool freenect_result = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices() == 0;
-        bool result = device_manager->deviceListIsEmpty();
+        bool freenect_result = std::make_unique<libfreenect2::Freenect2>()->enumerateDevices();
+        bool result = !device_manager->deviceListIsEmpty();
         EXPECT_EQ(freenect_result, result);
     }
 
@@ -60,6 +60,15 @@ namespace vision
         EXPECT_EQ(freenect_enumerate, dm_enum);
     }
 
+    TEST(DeviceManager, selectDevice){
+        DeviceManager* device_manager = DeviceManager::getInstance();
+        int dm_enumerate = device_manager->availableDeviceCount();
+        EXPECT_GT(dm_enumerate, 0);
+        auto device_list = device_manager->getDeviceList();
+        EXPECT_GT(device_list.size(), 0);
+        bool result = device_manager->selectDevice(0);
+        EXPECT_TRUE(result);
+    }
 
 
     int main(int argc, char **argv){

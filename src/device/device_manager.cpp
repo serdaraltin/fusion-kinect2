@@ -20,7 +20,7 @@ namespace vision
         freenect2_pipeline = new libfreenect2::CpuPacketPipeline();
 
         auto _devices = enumerateDevices();
-        devices.assign(devices.begin(), devices.end());
+        devices.assign(_devices.begin(), _devices.end());
     }
 
     DeviceManager* DeviceManager::getInstance()
@@ -55,6 +55,7 @@ namespace vision
 
     std::vector<Device> DeviceManager::getDeviceList() const
     {
+
         return devices;
     }
 
