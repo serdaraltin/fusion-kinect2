@@ -102,10 +102,7 @@ namespace vision
         return std::nullopt;
     }
 
-    bool DeviceManager::checkDevice(const int device_id)
-    {
-        return !freenect2.getDeviceSerialNumber(device_id).empty();
-    }
+
 
     std::optional<Device> DeviceManager::getDevice(const int device_id)
     {
@@ -169,6 +166,32 @@ namespace vision
         return selected_devices;
     }
 
+
+    bool DeviceManager::updateDevice(Device* device){
+        std::optional<int> index = findDeviceIndex(devices, device->getIdx());
+        if(!index)
+            return false;
+
+        //TODO this area will be filled
+        return false;
+    }
+
+    bool DeviceManager::checkDevice(const int device_id)
+    {
+        return !freenect2.getDeviceSerialNumber(device_id).empty();
+    }
+
+    bool DeviceManager::startDevice(const int device_id) {
+        if(!checkDevice(device_id))
+            return false;
+
+         auto device = freenect2.openDevice(device_id);
+         if(device == nullptr){
+            return false;
+         }
+
+
+    }
 
 
 

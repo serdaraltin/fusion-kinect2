@@ -25,10 +25,9 @@ namespace vision
         DeviceManager();
         ~DeviceManager() = default;
 
-
-        /*Device* createDevice(int device_id);
+        Device* createDevice(int device_id);
         bool updateDevice(Device* device);
-        bool deleteDevice(Device* device);*/
+        bool deleteDevice(Device* device);
 
         [[nodiscard]] static std::optional<int> findDeviceIndex(
             std::vector<Device> _devices, int device_id);
@@ -36,11 +35,12 @@ namespace vision
         FRIEND_TEST(DeviceManager, findDeviceIndex);
 
         bool checkDevice(int device_id);
-        /*
+        FRIEND_TEST(DeviceManager, checkDevice);
+
         bool startDevice(int device_id);
         bool stopDevice(int device_id);
         bool resetDevice(int device_id);
-        bool openDevice(int device_id);*/
+        bool openDevice(int device_id);
 
         std::vector<Device> enumerateDevices();
 
