@@ -53,7 +53,7 @@ namespace vision
         std::optional<Device> getDevice(int device_id);
         //std::optional<Device> getDevice(std::string device_serial);
         [[nodiscard]] int availableDeviceCount();
-        [[nodiscard]] std::vector<Device> getDeviceList() const;
+        [[nodiscard]] std::vector<Device> getDeviceList();
         [[nodiscard]] std::vector<Device> getSelectedDeviceList() const;
         [[nodiscard]] Result logDevicesList() const;
         [[nodiscard]] bool deviceListIsEmpty() const;

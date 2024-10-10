@@ -53,9 +53,10 @@ namespace vision
         return devices.empty();
     }
 
-    std::vector<Device> DeviceManager::getDeviceList() const
+    std::vector<Device> DeviceManager::getDeviceList()
     {
-
+        auto _devices = enumerateDevices();
+        devices.assign(_devices.begin(), _devices.end());
         return devices;
     }
 
@@ -172,7 +173,7 @@ namespace vision
         if(!index)
             return false;
 
-        //TODO this area will be filled
+        //TODO this area will be filled 
         return false;
     }
 

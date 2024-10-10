@@ -100,18 +100,20 @@ namespace vision
             GTEST_SKIP();
         }
         auto device_list = device_manager->getDeviceList();
-        std::optional<int> index = vision::DeviceManager::findDeviceIndex(device_list, 0);
+
+        std::optional<int> index = vision::DeviceManager::findDeviceIndex(device_list, device_list.front().getIdx());
         EXPECT_TRUE(index);
     }
 
     TEST(DeviceManager, checkDevice){
         DeviceManager *device_manager = DeviceManager::getInstance();
+        device_manager->enumerateDevices();
         if(!device_manager->availableDeviceCount()){
             GTEST_LOG_(INFO) << "Device not found !" << std::endl;
             GTEST_SKIP();
         }
         auto device_list = device_manager->getDeviceList();
-        bool  result = device_manager->checkDevice(device_list[0].getIdx());
+        bool  result = device_manager->checkDevice(device_list.front().getIdx());
         EXPECT_TRUE(result);
     }
 

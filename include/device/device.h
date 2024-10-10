@@ -67,7 +67,7 @@ namespace vision
               kinect2(kinect2)
         {
         }
-        Device operator=(const Device &other) {
+        Device operator=(const Device& other) {
             if (this == &other){
                 return *this;
             }
@@ -76,6 +76,7 @@ namespace vision
             this->nick_name = other.nick_name;
             this->open_status = other.open_status;
             this->kinect2 = other.kinect2;
+            return *this;
         }
         friend bool operator==(const Device& lhs, const Device& rhs)
         {
