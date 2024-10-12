@@ -1,0 +1,6 @@
+[submodule "modules/boost"]
+	path = modules/boost
+	url = https://github.com/boostorg/boost
+[submodule "modules/poco"]
+	path = modules/poco
+	url = https://github.com/pocoproject/poco
