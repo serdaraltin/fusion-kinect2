@@ -1,6 +1,5 @@
 #include "device/device_manager.h"
 #include "logger/console_logger.h"
-#include <opencv2/opencv.hpp>
 
 using namespace vision;
 
@@ -9,7 +8,6 @@ ConsoleLogger* console_logger = ConsoleLogger::getInstance();
 
 int main(int argc, char *argv[])
 {
-
 
     console_logger->log(Logger::Info, "Vision Finised.");
     return 0;
