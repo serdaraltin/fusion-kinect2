@@ -9,17 +9,8 @@ set(CMAKE_CXX_STANDARD 20)
 project(fusion_vision)
 
 # Find necessary packages
-find_package(OpenGL REQUIRED)        # OpenGL for graphics rendering
-find_package(glfw3 REQUIRED)         # GLFW for creating windows and OpenGL contexts
 find_package(OpenCV REQUIRED)        # OpenCV for computer vision functionalities
 find_package(Boost 1.86.0 REQUIRED)
-
-if(Boost_FOUND)
-    message(STATUS "Boost found at ${Boost_INCLUDE_DIRS}")
-else ()
-    message(FATAL_ERROR "Boost not found !")
-endif ()
-
 
 # Add include directories (for headers and external libraries)
 include_directories(
@@ -34,7 +25,7 @@ include_directories(
 # Recursively gather all source, header, and test files
 file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")  # Header files in include/
 file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")      # Source files in src/
-file(GLOB_RECURSE TEST_SOURCE "tests/**/*.cpp")    # Test files in tests/
+file(GLOB_RECURSE TEST_SOURCE "tests/*.cpp")    # Test files in tests/
 file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")         # Library headers in lib/
 
 # Main application entry point
@@ -45,10 +36,17 @@ message(STATUS "Source files: ${MAIN_SOURCE}")
 message(STATUS "Test files: ${TEST_SOURCE}")
 message(STATUS "Header files: ${HEADER_SOURCE}")
 
+message(STATUS "OpenCV files: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "Boost files: ${Boost_INCLUDE_DIRS}")
+
 # Ensure that source, header, and library files are present
 if (NOT MAIN_SOURCE OR NOT LIB_SOURCE OR NOT HEADER_SOURCE)
     message(FATAL_ERROR "Source files not found!")
 endif()
+
+if(NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost not found !")
+endif ()
 
 #------------------------------- MAIN EXECUTABLE -------------------------------
 
