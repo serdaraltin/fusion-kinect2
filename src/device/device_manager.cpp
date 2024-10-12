@@ -191,6 +191,7 @@ namespace vision
             return false;
          }
 
+        return true;
 
     }
 
