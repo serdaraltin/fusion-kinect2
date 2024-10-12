@@ -12,12 +12,21 @@ project(fusion_vision)
 find_package(OpenGL REQUIRED)        # OpenGL for graphics rendering
 find_package(glfw3 REQUIRED)         # GLFW for creating windows and OpenGL contexts
 find_package(OpenCV REQUIRED)        # OpenCV for computer vision functionalities
+find_package(Boost 1.86.0 REQUIRED)
+
+if(Boost_FOUND)
+    message(STATUS "Boost found at ${Boost_INCLUDE_DIRS}")
+else ()
+    message(FATAL_ERROR "Boost not found !")
+endif ()
+
 
 # Add include directories (for headers and external libraries)
 include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/include  # Custom include directory
         ${CMAKE_CURRENT_SOURCE_DIR}/lib      # Custom libraries directory
         ${OpenCV_INCLUDE_DIRS}               # OpenCV include directories
+        ${Boost_INCLUDE_DIRS}
 )
 
 #------------------------------- FILE GLOBBING -------------------------------
@@ -58,7 +67,10 @@ find_library(FREENECT2_LIB freenect2 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 target_link_libraries(fusion_vision
         ${FREENECT2_LIB}   # Kinect2 support
         ${OpenCV_LIBS}     # OpenCV libraries
+        ${Boost_LIBRARIES}
 )
+
+add_test(NAME Main COMMAND fusion_vision)
 
 #------------------------------- BUILD CONFIGURATION -------------------------------
 
