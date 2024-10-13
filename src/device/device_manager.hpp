@@ -15,11 +15,11 @@
 #define DeviceManager_H
 
 #include "libfreenect2/libfreenect2.hpp"
-#include "logger/console_logger.h"
-#include "debug/status.h"
-#include "device.h" // Device header
+#include "../logger/console_logger.hpp"
+#include "../debug/status.hpp"
+#include "device.hpp" // Device header
 #include <optional>  // C++17 feature for optional return types
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace vision
 {

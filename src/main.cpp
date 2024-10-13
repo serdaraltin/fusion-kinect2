@@ -1,5 +1,5 @@
-#include "device/device_manager.h"
-#include "logger/console_logger.h"
+#include "device/device_manager.hpp"
+#include "logger/console_logger.hpp"
 
 
 using namespace vision;
