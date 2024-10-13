@@ -89,7 +89,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Define the main test file entry point
-set(MAIN_TEST_FILE test/device/DeviceManager_test.cpp)
+set(MAIN_TEST_FILE test/device/device_manager_test.cpp)
 
 # Define the test executable
 add_executable(unit_test
