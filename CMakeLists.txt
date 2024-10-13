@@ -25,7 +25,7 @@ include_directories(
 # Recursively gather all source, header, and test files
 file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")  # Header files in include/
 file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")      # Source files in src/
-file(GLOB_RECURSE TEST_SOURCE "tests/*.cpp")    # Test files in tests/
+file(GLOB_RECURSE TEST_SOURCE "test/*.cpp")    # Test files in tests/
 file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")         # Library headers in lib/
 
 # Main application entry point
@@ -89,7 +89,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Define the main test file entry point
-set(MAIN_TEST_FILE tests/main_test.cpp)
+set(MAIN_TEST_FILE test/device/DeviceManager_test.cpp)
 
 # Define the test executable
 add_executable(unit_test
