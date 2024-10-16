@@ -4,12 +4,12 @@
 
 using namespace vision;
 
-DeviceManager* device_manager = DeviceManager::getInstance();
-ConsoleLogger* console_logger = ConsoleLogger::getInstance();
+device_manager* device_manager = device_manager::getInstance();
+console_logger* console_logger = console_logger::getInstance();
 
 int main(int argc, char *argv[])
 {
-    console_logger->log(Logger::Info, "Vision Finised.");
+    console_logger->log(logger::Info, "Vision Finised.");
     return 0;
 }
 
