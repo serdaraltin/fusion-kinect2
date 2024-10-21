@@ -17,7 +17,7 @@ namespace vision
      * levels of severity. Derived classes should implement the log
      * method to handle logging functionality.
      */
-    class Logger {
+    class logger {
     private:
     public:
         /**
@@ -39,7 +39,7 @@ namespace vision
         /**
          * @brief Default destructor.
          */
-        virtual ~Logger() = default;
+        virtual ~logger() = default;
 
         /**
          * @brief Log a message with a specific logging level.

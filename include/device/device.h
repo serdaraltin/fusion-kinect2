@@ -23,7 +23,7 @@ namespace vision
      * This class encapsulates the properties and functionalities related to a device,
      * including its identification, status, and associated resources.
      */
-    class Device
+    class device
     {
     private:
         int idx = -1; ///< Device index.
@@ -34,17 +34,17 @@ namespace vision
 
     public:
         /// Default constructor.
-        Device();
+        device();
 
         /// Default destructor.
-        ~Device() = default;
+        ~device() = default;
 
         /**
          * @brief Constructs a Device with an index.
          *
          * @param idx The index of the device.
          */
-        explicit Device(int idx)
+        explicit device(int idx)
                 : idx(idx)
         {
         }
@@ -55,7 +55,7 @@ namespace vision
          * @param idx The index of the device.
          * @param serial The serial number of the device.
          */
-        Device(int idx, std::string  serial)
+        device(int idx, std::string  serial)
                 : idx(idx),
                   serial(std::move(serial))
         {
@@ -68,7 +68,7 @@ namespace vision
          * @param serial The serial number of the device.
          * @param nick_name The nickname of the device.
          */
-        Device(int idx, std::string  serial, std::string  nick_name)
+        device(int idx, std::string  serial, std::string  nick_name)
                 : idx(idx),
                   serial(std::move(serial)),
                   nick_name(std::move(nick_name))
@@ -83,7 +83,7 @@ namespace vision
          * @param nick_name The nickname of the device.
          * @param kinect2 Pointer to the Kinect2 device.
          */
-        Device(int idx, std::string  serial, std::string  nick_name, libfreenect2::Freenect2Device* kinect2)
+        device(int idx, std::string  serial, std::string  nick_name, libfreenect2::Freenect2Device* kinect2)
                 : idx(idx),
                   serial(std::move(serial)),
                   nick_name(std::move(nick_name)),
@@ -100,7 +100,7 @@ namespace vision
          * @param open_status The open status of the device.
          * @param kinect2 Pointer to the Kinect2 device.
          */
-        Device(int idx, std::string  serial, std::string  nick_name, bool open_status,
+        device(int idx, std::string  serial, std::string  nick_name, bool open_status,
                libfreenect2::Freenect2Device* kinect2)
                 : idx(idx),
                   serial(std::move(serial)),
@@ -116,7 +116,7 @@ namespace vision
          * @param other The Device to copy.
          * @return Device& Reference to this device after assignment.
          */
-        Device operator=(const Device& other) {
+        device operator=(const device& other) {
             if (this == &other){
                 return *this;
             }
@@ -135,7 +135,7 @@ namespace vision
          * @param rhs The right-hand side device.
          * @return bool True if the devices are equal; false otherwise.
          */
-        friend bool operator==(const Device& lhs, const Device& rhs)
+        friend bool operator==(const device& lhs, const device& rhs)
         {
             return lhs.idx == rhs.idx
                    && lhs.nick_name == rhs.nick_name
@@ -150,7 +150,7 @@ namespace vision
          * @param rhs The right-hand side device.
          * @return bool True if the devices are not equal; false otherwise.
          */
-        friend bool operator!=(const Device& lhs, const Device& rhs)
+        friend bool operator!=(const device& lhs, const device& rhs)
         {
             return !(lhs == rhs);
         }
