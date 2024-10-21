@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../src/device/device_manager.hpp"
+#include "device/device_manager.h"
 
 namespace vision
 {

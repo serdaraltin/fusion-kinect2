@@ -5,8 +5,8 @@
 #include <format>
 #include <iostream>
 #include <ostream>
-#include "console_logger.hpp"
-#include "../config/config.hpp"
+#include "logger/console_logger.h"
+#include "config/config.h"
 #include "cxxabi.h"
 #include "execinfo.h"
 #include <dlfcn.h>

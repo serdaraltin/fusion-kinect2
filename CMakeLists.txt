@@ -23,7 +23,7 @@ include_directories(
 #------------------------------- FILE GLOBBING -------------------------------
 
 # Recursively gather all source, header, and test files
-file(GLOB_RECURSE HEADER_SOURCE "src/**/*.hpp")  # Header files in include/
+file(GLOB_RECURSE HEADER_SOURCE "include/**/*.h")  # Header files in include/
 file(GLOB_RECURSE MAIN_SOURCE "src/**/*.cpp")      # Source files in src/
 file(GLOB_RECURSE TEST_SOURCE "test/*.cpp")    # Test files in tests/
 file(GLOB_RECURSE LIB_SOURCE "lib/**/*.h")         # Library headers in lib/

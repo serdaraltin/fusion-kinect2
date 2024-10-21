@@ -5,7 +5,7 @@
 #ifndef CONSOLE_LOGGER_H
 #define CONSOLE_LOGGER_H
 
-#include "logger.hpp"
+#include "logger.h"
 
 namespace vision
 {

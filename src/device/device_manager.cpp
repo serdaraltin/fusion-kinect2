@@ -2,12 +2,12 @@
 // Created by Serdar on 19.09.2024.
 //
 
-#include "device_manager.hpp"
+#include "device/device_manager.h"
 
 #include <algorithm>
 #include <format>
-#include "../debug/status.hpp"
-#include "../device/device.hpp"
+#include "debug/status.h"
+#include "device/device.h"
 
 namespace vision
 {
