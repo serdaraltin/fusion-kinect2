@@ -35,7 +35,6 @@ set(MAIN_FILE src/main.cpp)
 message(STATUS "Source files: ${MAIN_SOURCE}")
 message(STATUS "Test files: ${TEST_SOURCE}")
 message(STATUS "Header files: ${HEADER_SOURCE}")
-
 message(STATUS "OpenCV files: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "Boost files: ${Boost_INCLUDE_DIRS}")
 
