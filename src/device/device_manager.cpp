@@ -2,19 +2,19 @@
 // Created by Serdar on 19.09.2024.
 //
 
-#include "device_manager.hpp"
+#include "device/device_manager.h"
 
 #include <algorithm>
 #include <format>
-#include "../debug/status.hpp"
-#include "../device/device.hpp"
+#include "debug/status.h"
+#include "device/device.h"
 
 namespace vision
 {
     // Definition of the Singleton instance
-    DeviceManager* DeviceManager::instance = nullptr;
+    device_manager* device_manager::instance = nullptr;
 
-    DeviceManager::DeviceManager()
+    device_manager::device_manager()
     {
         freenect2_device = nullptr;
         freenect2_pipeline = new libfreenect2::CpuPacketPipeline();
@@ -23,21 +23,21 @@ namespace vision
         devices.assign(_devices.begin(), _devices.end());
     }
 
-    DeviceManager* DeviceManager::getInstance()
+    device_manager* device_manager::getInstance()
     {
         if(instance == nullptr)
-            instance = new DeviceManager();
+            instance = new device_manager();
         return instance;
     }
 
-    int DeviceManager::availableDeviceCount()
+    int device_manager::availableDeviceCount()
     {
         return freenect2.enumerateDevices();
     }
 
-    std::vector<Device> DeviceManager::enumerateDevices()
+    std::vector<device> device_manager::enumerateDevices()
     {
-        std::vector<Device> _devices;
+        std::vector<device> _devices;
         int device_count = availableDeviceCount();
         if (device_count == 0)
             return _devices;
@@ -48,19 +48,19 @@ namespace vision
         return _devices;
     }
 
-    bool DeviceManager::deviceListIsEmpty() const
+    bool device_manager::deviceListIsEmpty() const
     {
         return devices.empty();
     }
 
-    std::vector<Device> DeviceManager::getDeviceList()
+    std::vector<device> device_manager::getDeviceList()
     {
         auto _devices = enumerateDevices();
         devices.assign(_devices.begin(), _devices.end());
         return devices;
     }
 
-    Result DeviceManager::refreshDeviceList()
+    Result device_manager::refreshDeviceList()
     {
         const auto _devices = enumerateDevices();
         if(_devices.empty())
@@ -74,25 +74,25 @@ namespace vision
         return {Status::Success,"List refreshed."};
     }
 
-    Result DeviceManager::logDevicesList() const
+    Result device_manager::logDevicesList() const
     {
         if(deviceListIsEmpty())
             return {Status::Cancelled,"List is empty!"};
 
-        console_logger->log(Logger::Info,"Listing devices...");
+        console_logger->log(logger::Info, "Listing devices...");
         for(const auto& device : devices)
         {
             console_logger->log(
-                Logger::Info,
-                std::format("{},{}",device.getIdx(),device.getNickName()));
+                    logger::Info,
+                    std::format("{},{}",device.getIdx(),device.getNickName()));
         }
         return Result(Status::Success);
     }
 
-    std::optional<int> DeviceManager::findDeviceIndex(std::vector<Device> _devices, int device_id)
+    std::optional<int> device_manager::findDeviceIndex(std::vector<device> _devices, int device_id)
     {
         const auto it = std::ranges::find_if(_devices,
-        [device_id] (const Device& device) -> bool{
+        [device_id] (const device& device) -> bool{
             return device.getIdx() == device_id;
         });
 
@@ -105,7 +105,7 @@ namespace vision
 
 
 
-    std::optional<Device> DeviceManager::getDevice(const int device_id)
+    std::optional<device> device_manager::getDevice(const int device_id)
     {
         if(!availableDeviceCount())
         {
@@ -122,12 +122,12 @@ namespace vision
         return std::nullopt;
     }
 
-    bool DeviceManager::selectedListIsEmpty() const
+    bool device_manager::selectedListIsEmpty() const
     {
         return selected_devices.empty();
     }
 
-    bool DeviceManager::selectDevice(const int device_id)
+    bool device_manager::selectDevice(const int device_id)
     {
         const auto _device = getDevice(device_id);
         if(_device == std::nullopt)
@@ -140,12 +140,12 @@ namespace vision
         return true;
     }
 
-    bool DeviceManager::deselectDevice(int device_id)
+    bool device_manager::deselectDevice(int device_id)
     {
         if(!checkDevice(device_id))
             return false;
         const auto it = std::ranges::find_if(selected_devices,
-        [device_id] (const Device& device) -> bool
+        [device_id] (const device& device) -> bool
         {
             return device.getIdx() == device_id;
         });
@@ -158,17 +158,17 @@ namespace vision
         return false;
     }
 
-    void DeviceManager::clearSelectedList()
+    void device_manager::clearSelectedList()
     {
         selected_devices.clear();
     }
 
-    std::vector<Device> DeviceManager::getSelectedDeviceList() const{
+    std::vector<device> device_manager::getSelectedDeviceList() const{
         return selected_devices;
     }
 
 
-    bool DeviceManager::updateDevice(Device* device){
+    bool device_manager::updateDevice(device* device){
         std::optional<int> index = findDeviceIndex(devices, device->getIdx());
         if(!index)
             return false;
@@ -177,12 +177,12 @@ namespace vision
         return false;
     }
 
-    bool DeviceManager::checkDevice(const int device_id)
+    bool device_manager::checkDevice(const int device_id)
     {
         return !freenect2.getDeviceSerialNumber(device_id).empty();
     }
 
-    bool DeviceManager::startDevice(const int device_id) {
+    bool device_manager::startDevice(const int device_id) {
         if(!checkDevice(device_id))
             return false;
 

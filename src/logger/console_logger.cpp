@@ -5,8 +5,8 @@
 #include <format>
 #include <iostream>
 #include <ostream>
-#include "console_logger.hpp"
-#include "../config/config.hpp"
+#include "logger/console_logger.h"
+#include "config/config.h"
 #include "cxxabi.h"
 #include "execinfo.h"
 #include <dlfcn.h>
@@ -15,20 +15,20 @@
 namespace vision
 {
 
-    ConsoleLogger* ConsoleLogger::instance;
-    ConsoleLogger::ConsoleLogger()
+    console_logger* console_logger::instance;
+    console_logger::console_logger()
     {
         level_ = Info;
         this->log(Info,"Console Logger initialized.");
     }
 
-    ConsoleLogger* ConsoleLogger::getInstance()
+    console_logger* console_logger::getInstance()
     {
         if (instance == nullptr)
-            instance = new ConsoleLogger();
+            instance = new console_logger();
         return instance;
     }
-    std::string ConsoleLogger::getLevelString(Level level)
+    std::string console_logger::getLevelString(Level level)
     {
         switch (level)
         {
@@ -41,7 +41,7 @@ namespace vision
         }
     }
 
-    void ConsoleLogger::log(Level level, const std::string& message)
+    void console_logger::log(Level level, const std::string& message)
     {
         if(level <= level_)
         {
