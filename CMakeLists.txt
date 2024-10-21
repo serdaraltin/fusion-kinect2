@@ -35,7 +35,6 @@ set(MAIN_FILE src/main.cpp)
 message(STATUS "Source files: ${MAIN_SOURCE}")
 message(STATUS "Test files: ${TEST_SOURCE}")
 message(STATUS "Header files: ${HEADER_SOURCE}")
-
 message(STATUS "OpenCV files: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "Boost files: ${Boost_INCLUDE_DIRS}")
 
@@ -89,7 +88,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Define the main test file entry point
-set(MAIN_TEST_FILE tests/main_test.cpp)
+set(MAIN_TEST_FILE test/device/device_manager_test.cpp)
 
 # Define the test executable
 add_executable(unit_test
