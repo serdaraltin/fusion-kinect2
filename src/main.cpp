@@ -4,7 +4,7 @@
 using namespace vision;
 
 device_manager* device_manager = device_manager::getInstance();
-console_logger* console_logger = console_logger::getInstance();
+ConsoleLogger* console_logger = ConsoleLogger::getInstance();
 
 int main(int argc, char *argv[])
 {

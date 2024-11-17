@@ -16,24 +16,24 @@ namespace vision
      * This class derives from the Logger base class and implements
      * the log function to print messages to the standard output.
      */
-    class console_logger : public logger {
+    class ConsoleLogger : public logger {
     private:
         /**
          * @brief Private constructor for singleton implementation.
          */
-        console_logger();
+        ConsoleLogger();
 
         /**
          * @brief Pointer to the singleton instance.
          */
-        static console_logger *instance;
+        static ConsoleLogger *instance;
 
     public:
         /**
          * @brief Get the singleton instance of the ConsoleLogger.
          * @return Pointer to the ConsoleLogger instance.
          */
-        static console_logger* getInstance();
+        static ConsoleLogger* getInstance();
 
         /**
          * @brief Convert a logging level to a string representation.
@@ -52,12 +52,12 @@ namespace vision
         /**
          * @brief Deleted copy constructor to prevent copying.
          */
-        console_logger(const console_logger &) = delete;
+        ConsoleLogger(const ConsoleLogger &) = delete;
 
         /**
          * @brief Deleted assignment operator to prevent assignment.
          */
-        console_logger &operator=(const console_logger &) = delete;
+        ConsoleLogger &operator=(const ConsoleLogger &) = delete;
 
     };
 }

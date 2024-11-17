@@ -15,20 +15,20 @@
 namespace vision
 {
 
-    console_logger* console_logger::instance;
-    console_logger::console_logger()
+    ConsoleLogger* ConsoleLogger::instance;
+    ConsoleLogger::ConsoleLogger()
     {
         level_ = Info;
         this->log(Info,"Console Logger initialized.");
     }
 
-    console_logger* console_logger::getInstance()
+    ConsoleLogger* ConsoleLogger::getInstance()
     {
         if (instance == nullptr)
-            instance = new console_logger();
+            instance = new ConsoleLogger();
         return instance;
     }
-    std::string console_logger::getLevelString(Level level)
+    std::string ConsoleLogger::getLevelString(Level level)
     {
         switch (level)
         {
@@ -41,7 +41,7 @@ namespace vision
         }
     }
 
-    void console_logger::log(Level level, const std::string& message)
+    void ConsoleLogger::log(Level level, const std::string& message)
     {
         if(level <= level_)
         {

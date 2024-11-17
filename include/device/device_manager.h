@@ -37,7 +37,7 @@ namespace vision
         libfreenect2::Freenect2 freenect2; ///< Instance of the Freenect2 library.
         libfreenect2::Freenect2Device *freenect2_device = nullptr; ///< Device manager instance.
         libfreenect2::PacketPipeline *freenect2_pipeline = nullptr; ///< Packet pipeline instance.
-        console_logger* console_logger = console_logger::getInstance(); ///< Logger instance.
+        ConsoleLogger* console_logger = ConsoleLogger::getInstance(); ///< Logger instance.
         std::vector<device> devices; ///< List of devices.
         std::vector<device> selected_devices; ///< List of selected devices.
         static device_manager* instance; ///< Singleton instance.
